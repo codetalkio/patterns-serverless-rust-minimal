@@ -45,7 +45,7 @@ In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`
 ## 🚢 Deployment using CDK
 We build and deploy by running `AWS_REGION=<YOUR_REGION> npm run deploy`, or just `AWS_REGION=<YOUR_REGION> npm run cdk:deploy` if you have already run `npm run build` previouslt.
 
-A couple of notes:
+A couple of quick notes:
 
 - We require you to explicitly set the `AWS_REGION` environment variable (to avoid mistakenly deploying into some random region).
 - If this is the first CDK deployment ever on your AWS account/region, run `AWS_REGION=<YOUR_REGION> npm run cdk:bootstrap` first. This creates the necessary CDK stack resources on the cloud.
@@ -131,7 +131,7 @@ $ aws lambda create-function --function-name sls-rust-test \
   --tracing-config Mode=Active
 ```
 
-NOTE: You can replace the `$(aws sts get-caller-identity | jq -r .Account)` call with your AWS account ID, if you do not have [jq](https://stedolan.github.io/jq/) installed.
+> 💡: You can replace the `$(aws sts get-caller-identity | jq -r .Account)` call with your AWS account ID, if you do not have [jq](https://stedolan.github.io/jq/) installed.
 
 **Invoke our function:**
 ```bash
