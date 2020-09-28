@@ -1,10 +1,10 @@
-name: cd-release
+name: pre-release
 
 # Refer to https://help.github.com/en/articles/workflow-syntax-for-github-actions for documentation on Actions.
 on:
   release:
     types:
-      - released
+      - prereleased
 
 jobs:
   deploy:
@@ -21,17 +21,17 @@ jobs:
       - name: Setup Node.js 14.12.0
         uses: actions/setup-node@v2
         with:
-          node-version: '14.12.0'
+          node-version: "14.12.0"
 
       - name: Upgrade NPM to 6.14.8
         run: |
           npm i -g npm@6.14.8
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: |
           npm ci
 
-      - name: 'Install dependencies'
+      - name: "Install dependencies"
         run: |
           npm ci
 
@@ -44,9 +44,9 @@ jobs:
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.RELEASE_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
         run: |
           # Move artifact into expected location.
           mv ./target/cdk/release/bootstrap-$GITHUB_SHA ./target/cdk/release/bootstrap

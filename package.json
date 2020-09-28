@@ -13,9 +13,9 @@
   "scripts": {
     "deploy": "npm run build && npm run cdk:deploy",
     "build": "npm run build:executable && npm run build:rename",
-    "build:executable": "cargo build --release --target x86_64-unknown-linux-musl --features vendored",
-    "build:rename": "npm run build:clean && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/release/sls_rust ./target/cdk/release/bootstrap",
-    "build:archive": "zip ./target/cdk/release/lambda.zip ./target/cdk/release/bootstrap",
+    "build:executable": "rustup target add x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl --features vendored",
+    "build:rename": "npm run build:clean && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap",
+    "build:archive": "zip ./lambda.zip ./target/cdk/release/bootstrap",
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
     "cdk:synth": "cdk synth # emits the synthesized CloudFormation template",
     "cdk:diff": "cdk diff # compare deployed stack with current state",
