@@ -1,13 +1,8 @@
-use lambda::handler_fn;
+use lambda::{handler_fn, Context};
+use serde_json::{json, Value};
 
-mod dynamodb;
-mod global;
-mod graphql;
-mod handler;
-mod types;
+pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-use crate::handler::handler;
-use crate::types::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -15,4 +10,11 @@ async fn main() -> Result<(), Error> {
     let runtime_handler = handler_fn(handler);
     lambda::run(runtime_handler).await?;
     Ok(())
+}
+
+/// Our handler processes the Lambda events and returns the response as JSON.
+pub async fn handler(event: Value, _: Context) -> Result<Value, Error> {
+    let first_name = event["firstName"].as_str().unwrap_or("world");
+
+    Ok(json!({ "message": format!("Hello, {}!", first_name) }))
 }

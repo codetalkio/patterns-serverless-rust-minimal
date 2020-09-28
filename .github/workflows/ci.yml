@@ -1,0 +1,69 @@
+name: ci
+
+# Check out https://help.github.com/en/articles/workflow-syntax-for-github-actions for documentation on Actions.
+on: push
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-08-28
+          override: true
+      - run: cargo check --all
+
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-08-28
+          override: true
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-08-28
+          override: true
+          components: clippy
+      - run: cargo clippy --all-targets -- -D clippy::all
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-08-28
+          override: true
+      - run: cargo test
+
+  # Generate a static build artifact for usage in deployments.
+  assets:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    needs: [check, fmt, clippy, test]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-08-28
+          override: true
+          target: x86_64-unknown-linux-musl
+      - run: |
+          cargo build --release --target x86_64-unknown-linux-musl --features vendored
+          mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/release/sls_rust ./target/cdk/release/bootstrap
+      - uses: actions/upload-artifact@v2
+        with:
+          name: bootstrap-${{ env.GITHUB_SHA }}
+          path: ./target/cdk/release/bootstrap
+          if-no-files-found: error

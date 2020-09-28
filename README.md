@@ -1,4 +1,4 @@
-# Serverless: Rust
+# Patterns: Serverless Rust (minimal)
 The following is an example of deploying a Rust AWS Lambda function, which uses DynamoDB as the database. All deployment is managed by the AWS CDK tool.
 
 **Quick start:**

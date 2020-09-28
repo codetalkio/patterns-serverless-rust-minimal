@@ -1,19 +1,15 @@
 use lambda::Context;
 use serde_json::json;
 
-use sls_rust::graphql::types::*;
-use sls_rust::handler::handler;
+use sls_rust_minimal::main::*;
 
 #[tokio::test]
 async fn handler_handles_basic_event() {
     let event = json!({
-        "query": "{ movies { name year } }"
+        "firstName": "Earth"
     });
     let expected = json!({
-        "movies": vec![Movie {
-            name: "Bill and Ted".to_string(),
-            year: 1989,
-        }]
+        "message": "Hello, Earth!"
     });
     let result = handler(event.clone(), Context::default())
         .await
