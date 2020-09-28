@@ -3,7 +3,6 @@ use serde_json::{json, Value};
 
 pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     // Attach our own handler function to the lambda rust runtime, and run it.
