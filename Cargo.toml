@@ -1,0 +1,43 @@
+[package]
+name = "sls_rust"
+version = "0.0.1"
+authors = ["Christian <ckl@codetalk.io>"]
+edition = "2018"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+
+[profile.release]
+# Less code to include into binary.
+panic = 'abort'
+# Optimization over all codebase (better optimization, slower build).
+codegen-units = 1
+# Optimization for size (more aggresive).
+opt-level = 'z' # or 's' for a less aggressiv alternative.
+# Link time optimization using using whole-program analysis.
+lto = true
+
+[dependencies]
+lambda = { git = "https://github.com/awslabs/aws-lambda-rust-runtime/", rev = "c36409c5e65f994c7ff48510cd111905b4aa77c9"}
+tokio = { version = "0.2.22", features = ["macros"] }
+serde = "1.0.116"
+serde_derive = "1.0.116"
+serde_json = "1.0.57"
+rusoto_core = "0.45.0"
+rusoto_sqs = "0.45.0"
+rusoto_s3 = "0.45.0"
+rusoto_dynamodb = "0.45.0"
+dynomite = "0.10.0"
+uuid = "0.8.1"
+async-graphql = "1.18.2"
+lazy_static = "1.4.0"
+# Add openssl-sys as a direct dependency so it can be cross compiled to
+# x86_64-unknown-linux-musl using the "vendored" feature below
+openssl-sys = "*"
+
+[dev-dependencies]
+pretty_assertions = "0.6.1"
+
+[features]
+# Force openssl-sys to staticly link in the openssl library. Necessary when
+# cross compiling to x86_64-unknown-linux-musl.
+vendored = ["openssl-sys/vendored"]
