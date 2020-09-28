@@ -1,4 +1,4 @@
-# Patterns: Serverless Rust (minimal)
+# Patterns: Serverless Rust (minimal) ![ci badge](https://github.com/codetalkio/patterns-serverless-rust-minimal/workflows/ci/badge.svg?branch=master)
 The following is an minimal templae for deploying a Rust AWS Lambda function. All deployment is managed by the AWS CDK tool.
 
 If you are interested in a more fully-featured version of this, check out [patterns-serverless-rust](https://github.com/codetalkio/patterns-serverless-rust) for how to expose a GraphQL endpoint and use DynamoDB.
