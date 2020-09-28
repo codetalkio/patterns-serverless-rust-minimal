@@ -1,11 +1,13 @@
 # Patterns: Serverless Rust (minimal)
-The following is an example of deploying a Rust AWS Lambda function, which uses DynamoDB as the database. All deployment is managed by the AWS CDK tool.
+The following is an minimal templae for deploying a Rust AWS Lambda function. All deployment is managed by the AWS CDK tool.
+
+If you are interested in a more fully-featured version of this, check out [patterns-serverless-rust](https://github.com/codetalkio/patterns-serverless-rust) for how to expose a GraphQL endpoint and use DynamoDB.
 
 **✨ Features ✨**
 
-- 🦀 Production-grade serverless setup using Rust and AWS CDK.
-- 🚗 CI using GitHub actions and automatic asset uploading.
-- 🚀 Deployments via GitHub releases.
+- 🦀 Ready-to-use serverless setup using Rust and [AWS CDK](https://github.com/aws/aws-cdk).
+- 🚗 CI using [GitHub actions](https://github.com/features/actions) and automatic asset uploading.
+- 🚀 Deployments via [GitHub releases](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-releases).
 
 ### Overview
 
@@ -13,9 +15,11 @@ The following is an example of deploying a Rust AWS Lambda function, which uses 
 - [Building](#-building)
 - [Deployment using CDK](#-deployment-using-cdk)
 - [Deployment using AWS CLI](#-deployment-using-aws-cli)
+- [GitHub Actions (CI/CD)](#--github-actions-cicd)
 - [Performance Traces using AWS XRay](#️️-performance-traces-using-aws-xray)
 - [Naming convention](#-naming-convention)
 - [Libraries](#-libraries)
+- [Contributing](#️-contributing)
 
 ## ⚡️ Quick start
 
@@ -158,9 +162,9 @@ $ aws iam delete-role --role-name sls-rust-test-execution
 ```
 
 ## 🚗 🚀 GitHub Actions (CI/CD)
-Using GitHub actions allows us to have an efficient CI/CD setup with minimal work.
+Using [GitHub actions](/actions) allows us to have an efficient CI/CD setup with minimal work.
 
-The CI will work seamlessly without any manual steps, but for the deployments to work, you will need to set up your GitHub secrets for the repository for the following variables:
+The CI will work seamlessly without any manual steps, but for deployments via [GitHub releases](/releases) to work, you will need to set up your GitHub secrets for the repository for the following variables:
 
 - **RELEASE_AWS_ACCESS_KEY_ID**
 - **RELEASE_AWS_SECRET_ACCESS_KEY**
