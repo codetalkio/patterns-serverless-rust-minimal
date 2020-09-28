@@ -6,8 +6,13 @@ If you are interested in a more fully-featured version of this, check out [patte
 **✨ Features ✨**
 
 - 🦀 Ready-to-use serverless setup using Rust and [AWS CDK](https://github.com/aws/aws-cdk).
+- 👩‍💻 Local development setup using [LocalStack](https://github.com/localstack/localstack).
 - 🚗 CI using [GitHub actions](https://github.com/features/actions) and automatic asset uploading.
 - 🚀 Deployments via [GitHub releases](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-releases).
+
+Remaining:
+
+- [ ] Add LocalStack
 
 ### Overview
 
