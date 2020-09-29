@@ -19,7 +19,7 @@ jobs:
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
       - name: Setup Node.js 14.12.0
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
           node-version: "14.12.0"
 
