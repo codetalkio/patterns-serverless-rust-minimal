@@ -101,7 +101,7 @@ jobs:
   # Validate our deployment setup by deploying the stack to LocalStack.
   localstack:
     runs-on: ubuntu-latest
-    # needs: [assets]
+    needs: [assets]
     services:
       localstack:
         image: localstack/localstack:latest
