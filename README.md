@@ -13,6 +13,7 @@ If you are interested in a more fully-featured version of this, check out [patte
 Remaining:
 
 - [ ] Add LocalStack
+- [ ] Add [cache](https://github.com/actions/cache/blob/main/examples.md#rust---cargo) to the GitHub actions
 
 ### Overview
 

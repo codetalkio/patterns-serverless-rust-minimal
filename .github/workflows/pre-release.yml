@@ -19,7 +19,7 @@ jobs:
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
       - name: Setup Node.js 14.12.0
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
           node-version: "14.12.0"
 
@@ -45,7 +45,7 @@ jobs:
       # Disabled: Artifacts are not available across workflows.
       # - uses: actions/download-artifact@v2
       #   with:
-      #     name: bootstrap-${{ env.github.sha }}
+      #     name: bootstrap-${{ github.sha }}
       #     path: ./target/cdk/release
 
       - name: Install musl-tools
@@ -66,7 +66,7 @@ jobs:
       - run: |
           cargo build --release --target x86_64-unknown-linux-musl --features vendored
           # Move artifact into expected location.
-          mv ./target/cdk/release/bootstrap ./target/cdk/release/bootstrap
+          cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
