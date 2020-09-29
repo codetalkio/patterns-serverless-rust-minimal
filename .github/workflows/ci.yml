@@ -65,6 +65,6 @@ jobs:
           cargo build --release --target x86_64-unknown-linux-musl --features vendored
       - uses: actions/upload-artifact@v2
         with:
-          name: bootstrap-${{ env.github.sha }}
+          name: bootstrap-${{ github.sha }}
           path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
           if-no-files-found: error
