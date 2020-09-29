@@ -23,6 +23,13 @@ jobs:
         with:
           node-version: "14.12.0"
 
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-
+
       - name: Upgrade NPM to 6.14.8
         run: |
           npm i -g npm@6.14.8
@@ -35,11 +42,31 @@ jobs:
         run: |
           npm ci
 
-      - uses: actions/download-artifact@v2
+      # Disabled: Artifacts are not available across workflows.
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: bootstrap-${{ env.github.sha }}
+      #     path: ./target/cdk/release
+
+      - name: Install musl-tools
+        run: sudo apt-get install musl-tools
+      - uses: actions-rs/toolchain@v1
         with:
-          name: bootstrap-${{ env.github.sha }}
-          path: ./target/cdk/release
-          if-no-files-found: error
+          toolchain: nightly-2020-08-28
+          override: true
+          target: x86_64-unknown-linux-musl
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
+
+      - run: |
+          cargo build --release --target x86_64-unknown-linux-musl --features vendored
+          # Move artifact into expected location.
+          mv ./target/cdk/release/bootstrap ./target/cdk/release/bootstrap
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
@@ -48,6 +75,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
         run: |
-          # Move artifact into expected location.
-          mv ./target/cdk/release/bootstrap-$GITHUB_SHA ./target/cdk/release/bootstrap
           AWS_REGION=$AWS_DEFAULT_REGION npm run cdk:deploy

@@ -12,6 +12,13 @@ jobs:
         with:
           toolchain: nightly-2020-08-28
           override: true
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo check --all
 
   fmt:
@@ -34,6 +41,13 @@ jobs:
           toolchain: nightly-2020-08-28
           override: true
           components: clippy
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo clippy --all-targets -- -D clippy::all
 
   test:
@@ -44,6 +58,13 @@ jobs:
         with:
           toolchain: nightly-2020-08-28
           override: true
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo test
 
   # Generate a static build artifact for usage in deployments.
@@ -61,10 +82,20 @@ jobs:
           toolchain: nightly-2020-08-28
           override: true
           target: x86_64-unknown-linux-musl
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
+
       - run: |
           cargo build --release --target x86_64-unknown-linux-musl --features vendored
-      - uses: actions/upload-artifact@v2
-        with:
-          name: bootstrap-${{ env.github.sha }}
-          path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
-          if-no-files-found: error
+
+      # Disabled: Artifacts are not available across workflows.
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: bootstrap-${{ env.github.sha }}
+      #     path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
+      #     if-no-files-found: error
