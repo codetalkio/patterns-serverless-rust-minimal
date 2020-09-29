@@ -151,7 +151,11 @@ jobs:
           name: bootstrap-${{ github.sha }}
           path: ./target/cdk/release
 
-      - name: Deploy to LocalStack
+      - name: Bootstrapping LocalStack
         run: |
+          mv ./target/cdk/release/bootstrap-$GITHUB_SHA ./target/cdk/release/bootstrap
           npm run cdklocal:bootstrap
+
+      - name: Deploying to LocalStack
+        run: |
           npm run cdklocal:deploy
