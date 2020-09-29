@@ -136,6 +136,7 @@ jobs:
           [default]
           aws_access_key_id = localkey
           aws_secret_access_key = localsecret
+
           EOF
           )" >> ~/.aws/credentials
 
@@ -143,6 +144,7 @@ jobs:
           [default]
           output = json
           region = eu-west-1
+
           EOF
           )" >> ~/.aws/config
 
