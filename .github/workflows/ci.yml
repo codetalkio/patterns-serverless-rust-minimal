@@ -90,12 +90,13 @@ jobs:
 
       - run: |
           cargo build --release --target x86_64-unknown-linux-musl --features vendored
+          cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap
 
       # NOTE: Artifacts are not available across workflows.
       - uses: actions/upload-artifact@v2
         with:
           name: bootstrap
-          path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
+          path: ./target/cdk/release/bootstrap
           if-no-files-found: error
 
   # Validate our deployment setup by deploying the stack to LocalStack.
@@ -135,25 +136,6 @@ jobs:
         run: |
           npm ci
 
-      # - run: |
-      #     mkdir -p ~/.aws
-
-      #     echo "$(cat <<EOF
-      #     [default]
-      #     aws_access_key_id = localkey
-      #     aws_secret_access_key = localsecret
-
-      #     EOF
-      #     )" >> ~/.aws/credentials
-
-      #     echo "$(cat <<EOF
-      #     [default]
-      #     region = eu-west-1
-      #     output = json
-
-      #     EOF
-      #     )" >> ~/.aws/config
-
       - uses: actions/download-artifact@v2
         with:
           name: bootstrap
@@ -170,8 +152,6 @@ jobs:
 
       - name: Deploying to LocalStack
         run: |
-          ls ./target/cdk
-          ls ./target/cdk/release
           npm run cdklocal:deploy
         env:
           DEFAULT_REGION: eu-west-1
