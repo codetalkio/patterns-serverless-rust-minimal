@@ -154,14 +154,13 @@ jobs:
           EOF
           )" >> ~/.aws/config
 
-      # - uses: actions/download-artifact@v2
-      #   with:
-      #     name: bootstrap
-      #     path: ./target/cdk/release
+      - uses: actions/download-artifact@v2
+        with:
+          name: bootstrap
+          path: ./target/cdk/release
 
       - name: Bootstrapping LocalStack
         run: |
-          mkdir -p ./target/cdk/release
           npm run cdklocal:bootstrap
         env:
           DEFAULT_REGION: eu-west-1
