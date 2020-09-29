@@ -146,16 +146,18 @@ jobs:
           EOF
           )" >> ~/.aws/config
 
+      - name: Bootstrapping LocalStack
+        run: |
+          npm run cdklocal:bootstrap
+
       - uses: actions/download-artifact@v2
         with:
           name: bootstrap-${{ github.sha }}
           path: ./target/cdk/release
 
-      - name: Bootstrapping LocalStack
-        run: |
-          mv ./target/cdk/release/bootstrap-$GITHUB_SHA ./target/cdk/release/bootstrap
-          npm run cdklocal:bootstrap
-
       - name: Deploying to LocalStack
         run: |
+          ls ./target/cdk
+          ls ./target/cdk/release
+          mv ./target/cdk/release/bootstrap-$GITHUB_SHA ./target/cdk/release/bootstrap
           npm run cdklocal:deploy
