@@ -110,6 +110,9 @@ jobs:
           DEFAULT_REGION: eu-west-1
           AWS_ACCESS_KEY_ID: localkey
           AWS_SECRET_ACCESS_KEY: localsecret
+        ports:
+          - 4566:4566
+          - 4571:4571
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node.js 14.12.0
