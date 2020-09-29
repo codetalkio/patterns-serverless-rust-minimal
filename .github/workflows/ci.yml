@@ -4,104 +4,104 @@ name: ci
 on: push
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2020-08-28
-          override: true
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-${{ hashFiles('**/Cargo.lock') }}
-      - run: cargo check --all
+  # check:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: nightly-2020-08-28
+  #         override: true
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ~/.cargo/registry
+  #           ~/.cargo/git
+  #           target
+  #         key: cargo-${{ hashFiles('**/Cargo.lock') }}
+  #     - run: cargo check --all
 
-  fmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2020-08-28
-          override: true
-          components: rustfmt
-      - run: cargo fmt --all -- --check
+  # fmt:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: nightly-2020-08-28
+  #         override: true
+  #         components: rustfmt
+  #     - run: cargo fmt --all -- --check
 
-  clippy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2020-08-28
-          override: true
-          components: clippy
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-${{ hashFiles('**/Cargo.lock') }}
-      - run: cargo clippy --all-targets -- -D clippy::all
+  # clippy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: nightly-2020-08-28
+  #         override: true
+  #         components: clippy
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ~/.cargo/registry
+  #           ~/.cargo/git
+  #           target
+  #         key: cargo-${{ hashFiles('**/Cargo.lock') }}
+  #     - run: cargo clippy --all-targets -- -D clippy::all
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2020-08-28
-          override: true
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-${{ hashFiles('**/Cargo.lock') }}
-      - run: cargo test
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: nightly-2020-08-28
+  #         override: true
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ~/.cargo/registry
+  #           ~/.cargo/git
+  #           target
+  #         key: cargo-${{ hashFiles('**/Cargo.lock') }}
+  #     - run: cargo test
 
-  # Generate a static build artifact for usage in deployments.
-  assets:
-    runs-on: ubuntu-latest
+  # # Generate a static build artifact for usage in deployments.
+  # assets:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install musl-tools
-        run: sudo apt-get install musl-tools
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2020-08-28
-          override: true
-          target: x86_64-unknown-linux-musl
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Install musl-tools
+  #       run: sudo apt-get install musl-tools
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         toolchain: nightly-2020-08-28
+  #         override: true
+  #         target: x86_64-unknown-linux-musl
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ~/.cargo/registry
+  #           ~/.cargo/git
+  #           target
+  #         key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
 
-      - run: |
-          cargo build --release --target x86_64-unknown-linux-musl --features vendored
+  #     - run: |
+  #         cargo build --release --target x86_64-unknown-linux-musl --features vendored
 
-      # NOTE: Artifacts are not available across workflows.
-      - uses: actions/upload-artifact@v2
-        with:
-          name: bootstrap
-          path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
-          if-no-files-found: error
+  #     # NOTE: Artifacts are not available across workflows.
+  #     - uses: actions/upload-artifact@v2
+  #       with:
+  #         name: bootstrap
+  #         path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
+  #         if-no-files-found: error
 
   # Validate our deployment setup by deploying the stack to LocalStack.
   localstack:
     runs-on: ubuntu-latest
-    needs: [assets]
+    # needs: [assets]
     services:
       localstack:
         image: localstack/localstack:latest
@@ -129,13 +129,33 @@ jobs:
         run: |
           npm ci
 
-      - uses: actions/download-artifact@v2
-        with:
-          name: bootstrap
-          path: ./target/cdk/release
+      - run: |
+          mkdir -p ~/.aws
+
+          echo "$(cat <<EOF
+          [default]
+          aws_access_key_id = localkey
+          aws_secret_access_key = localsecret
+          EOF
+          )" >> ~/.aws/credentials
+
+          echo "$(cat <<EOF
+          [default]
+          output = json
+          region = eu-west-1
+          EOF
+          )" >> ~/.aws/config
+
+      # - uses: actions/download-artifact@v2
+      #   with:
+      #     name: bootstrap
+      #     path: ./target/cdk/release
 
       - name: Bootstrapping LocalStack
         run: |
+          ls ~/.aws
+          cat ~/.aws/credentials
+          cat ~/.aws/config
           npm run cdklocal:bootstrap
         env:
           DEFAULT_REGION: eu-west-1
