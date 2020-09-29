@@ -162,6 +162,7 @@ jobs:
           npm run cdklocal:bootstrap
         env:
           DEFAULT_REGION: eu-west-1
+          AWS_ACCOUNT_ID: 000000000000
           AWS_ACCESS_KEY_ID: localkey
           AWS_SECRET_ACCESS_KEY: localsecret
 
@@ -172,5 +173,6 @@ jobs:
           npm run cdklocal:deploy
         env:
           DEFAULT_REGION: eu-west-1
+          AWS_ACCOUNT_ID: 000000000000
           AWS_ACCESS_KEY_ID: localkey
           AWS_SECRET_ACCESS_KEY: localsecret
