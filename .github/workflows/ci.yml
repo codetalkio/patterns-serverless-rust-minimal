@@ -107,6 +107,9 @@ jobs:
         image: localstack/localstack:latest
         env:
           SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+          DEFAULT_REGION: eu-west-1
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
     steps:
       - uses: actions/checkout@v2
       - name: Setup Node.js 14.12.0
@@ -142,8 +145,8 @@ jobs:
 
           echo "$(cat <<EOF
           [default]
-          output = json
           region = eu-west-1
+          output = json
 
           EOF
           )" >> ~/.aws/config
@@ -156,9 +159,6 @@ jobs:
       - name: Bootstrapping LocalStack
         run: |
           mkdir -p ./target/cdk/release
-          ls ~/.aws
-          cat ~/.aws/credentials
-          cat ~/.aws/config
           npm run cdklocal:bootstrap
         env:
           DEFAULT_REGION: eu-west-1
