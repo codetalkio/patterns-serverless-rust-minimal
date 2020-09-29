@@ -15,16 +15,20 @@
     "build": "npm run build:executable && npm run build:rename",
     "build:executable": "rustup target add x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl --features vendored",
     "build:rename": "npm run build:clean && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap",
-    "build:archive": "zip ./lambda.zip ./target/cdk/release/bootstrap",
+    "build:archive": "(cd ./target/cdk/release/ && zip ./lambda.zip ./bootstrap) && mv ./target/cdk/release/lambda.zip ./lambda.zip",
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
     "cdk:synth": "cdk synth # emits the synthesized CloudFormation template",
     "cdk:diff": "cdk diff # compare deployed stack with current state",
     "cdk:deploy": "[[ $CI == 'true' ]] && CDK_APPROVAL='never' || CDK_APPROVAL='broadening'; cdk deploy --require-approval $CDK_APPROVAL $npm_package_name # deploy this stack to your default AWS account/region",
-    "cdk:bootstrap": "cdk bootstrap aws://$(aws sts get-caller-identity | jq -r .Account)/$AWS_REGION # bootstrap necessary resources on first usage of CDK in a region"
+    "cdk:bootstrap": "cdk bootstrap aws://$(aws sts get-caller-identity | jq -r .Account)/$AWS_REGION # bootstrap necessary resources on first usage of CDK in a region",
+    "cdklocal:clear-cache": "(rm ~/.cdk/cache/accounts.json || true) && (rm ~/.cdk/cache/accounts_partitions.json || true)",
+    "cdklocal:deploy": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal deploy --require-approval never $npm_package_name",
+    "cdklocal:bootstrap": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal bootstrap aws://000000000000/"
   },
   "dependencies": {},
   "devDependencies": {
     "aws-cdk": "1.64.1",
+    "aws-cdk-local": "1.64.1-dev1",
     "@aws-cdk/core": "1.64.1",
     "@aws-cdk/assert": "1.64.1",
     "@aws-cdk/aws-apigateway": "1.64.1",
