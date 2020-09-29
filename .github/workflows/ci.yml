@@ -155,6 +155,7 @@ jobs:
 
       - name: Bootstrapping LocalStack
         run: |
+          mkdir -p ./target/cdk/release
           ls ~/.aws
           cat ~/.aws/credentials
           cat ~/.aws/config
