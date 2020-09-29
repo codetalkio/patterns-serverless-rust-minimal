@@ -13,7 +13,6 @@ If you are interested in a more fully-featured version of this, check out [patte
 Remaining:
 
 - [ ] Add LocalStack
-- [ ] Add [cache](https://github.com/actions/cache/blob/main/examples.md#rust---cargo) to the GitHub actions
 
 ### Overview
 
@@ -48,6 +47,16 @@ Behind the scenes, the `build` NPM script does the following:
 
 In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`, rename the binary to `bootstrap`, and CDK uses that as its asset. With custom runtimes, AWS Lambda looks for an executable called `bootstrap`, so this is why we need the renaming step.
 
+## 👩‍💻 Development using LocalStack
+
+LocalStack allows us to deploy our CDK services directly to our local environment:
+
+- `docker-compose up` to start the LocalStack services.
+- `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
+- `npm run cdklocal:deploy` to deploy our stack.
+
+We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
+
 ## 🚢 Deployment using CDK
 We build and deploy by running `AWS_REGION=<YOUR_REGION> npm run deploy`, or just `AWS_REGION=<YOUR_REGION> npm run cdk:deploy` if you have already run `npm run build` previouslt.
 
@@ -65,7 +74,7 @@ A couple of quick notes:
 To deploy your function, call `AWS_REGION=<YOUR_REGION> npm run cdk:deploy`,
 
 ```bash
-$ AWS_REGION=eu-central-1 npm run cdk:deploy
+$ AWS_REGION=eu-west-1 npm run cdk:deploy
 ...
 sls-rust: deploying...
 [0%] start: Publishing bdbf8354358bc096823baac946ba64130b6397ff8e7eda2f18d782810e158c39:current
@@ -76,10 +85,10 @@ sls-rust: creating CloudFormation changeset...
  ✅  sls-rust
 
 Outputs:
-sls-rust.entryArn = arn:aws:lambda:eu-central-1:xxxxxxxxxxxxxx:function:sls-rust-main
+sls-rust.entryArn = arn:aws:lambda:eu-west-1:xxxxxxxxxxxxxx:function:sls-rust-main
 
 Stack ARN:
-arn:aws:cloudformation:eu-central-1:xxxxxxxxxxxxxx:stack/sls-rust/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
+arn:aws:cloudformation:eu-west-1:xxxxxxxxxxxxxx:stack/sls-rust/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
 ```
 
 > 💡:  The security prompt is automatically disabled on CIs that set `CI=true`. You can remove this check by setting `--require-approval never` in the `cdk:deploy` npm command.

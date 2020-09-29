@@ -69,9 +69,7 @@ jobs:
 
   # Generate a static build artifact for usage in deployments.
   assets:
-    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    needs: [check, fmt, clippy, test]
 
     steps:
       - uses: actions/checkout@v2
@@ -92,10 +90,71 @@ jobs:
 
       - run: |
           cargo build --release --target x86_64-unknown-linux-musl --features vendored
+          cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap
 
-      # Disabled: Artifacts are not available across workflows.
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: bootstrap-${{ github.sha }}
-      #     path: ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal
-      #     if-no-files-found: error
+      # NOTE: Artifacts are not available across workflows.
+      - uses: actions/upload-artifact@v2
+        with:
+          name: bootstrap
+          path: ./target/cdk/release/bootstrap
+          if-no-files-found: error
+
+  # Validate our deployment setup by deploying the stack to LocalStack.
+  localstack:
+    runs-on: ubuntu-latest
+    needs: [assets]
+    services:
+      localstack:
+        image: localstack/localstack:latest
+        env:
+          SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+          DEFAULT_REGION: eu-west-1
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
+        ports:
+          - 4566:4566
+          - 4571:4571
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Node.js 14.12.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.12.0"
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-
+
+      - name: Upgrade NPM to 6.14.8
+        run: |
+          npm i -g npm@6.14.8
+
+      - name: "Install dependencies"
+        run: |
+          npm ci
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: bootstrap
+          path: ./target/cdk/release
+
+      - name: Bootstrapping LocalStack
+        run: |
+          npm run cdklocal:bootstrap
+        env:
+          DEFAULT_REGION: eu-west-1
+          AWS_ACCOUNT_ID: "000000000000"
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
+
+      - name: Deploying to LocalStack
+        run: |
+          npm run cdklocal:deploy
+        env:
+          DEFAULT_REGION: eu-west-1
+          AWS_ACCOUNT_ID: "000000000000"
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
