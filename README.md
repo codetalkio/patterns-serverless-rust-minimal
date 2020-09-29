@@ -49,52 +49,13 @@ In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`
 
 ## 👩‍💻 Development using LocalStack
 
-LocalStack allows us to deploy our CDK services directly to our local environment.
+LocalStack allows us to deploy our CDK services directly to our local environment:
 
 - `docker-compose up` to start the LocalStack services.
+- `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
+- `npm run cdklocal:deploy` to deploy our stack.
 
-We can now target the local services by setting the endpoint option on the AWS CLI, as such `aws --endpoint-url=http://localhost:4566`.
-
-For example, deploying a Lambda to the local stack using the AWS CLI:
-
-```bash
-$ npm run build && npm run build:archive
-```
-
-Create the Lambda function,
-
-```bash
-$ aws --endpoint-url=http://localhost:4566 \
-  lambda create-function --function-name sls-rust-test \
-  --handler doesnt.matter \
-  --cli-binary-format raw-in-base64-out \
-  --zip-file fileb://./lambda.zip \
-  --runtime provided \
-  --role arn:aws:iam::$(aws --endpoint-url=http://localhost:4566 sts get-caller-identity | jq -r .Account):role/sls-rust-test-execution \
-  --environment Variables={RUST_BACKTRACE=1} \
-  --tracing-config Mode=Active
-```
-
-or update the function,
-
-```bash
-$ aws --endpoint-url=http://localhost:4566 \
-  lambda update-function-code \
-  --cli-binary-format raw-in-base64-out \
-  --function-name  sls-rust-test \
-  --zip-file fileb://lambda.zip
-```
-
-and invoke it,
-
-```bash
-$ aws --endpoint-url=http://localhost:4566 \
-  lambda invoke --function-name sls-rust-test \
-  --cli-binary-format raw-in-base64-out \
-  --payload '{"firstName": "world"}' \
-  output.json > /dev/null && cat output.json && rm output.json
-{"message":"Hello, world!"}
-```
+We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
 
 ## 🚢 Deployment using CDK
 We build and deploy by running `AWS_REGION=<YOUR_REGION> npm run deploy`, or just `AWS_REGION=<YOUR_REGION> npm run cdk:deploy` if you have already run `npm run build` previouslt.

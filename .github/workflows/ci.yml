@@ -153,5 +153,5 @@ jobs:
 
       - name: Deploy to LocalStack
         run: |
-          npm run cdklocal:boostrap
+          npm run cdklocal:bootstrap
           npm run cdklocal:deploy
