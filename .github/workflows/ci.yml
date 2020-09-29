@@ -129,23 +129,6 @@ jobs:
         run: |
           npm ci
 
-      - run: |
-          mkdir -p ~/.aws
-
-          echo "$(cat <<EOF
-          [default]
-          aws_access_key_id = dummy-key
-          aws_secret_access_key = dummy-key
-          EOF
-          )" >> ~/.aws/credentials
-
-          echo "$(cat <<EOF
-          [default]
-          output = json
-          region = eu-west-1
-          EOF
-          )" >> ~/.aws/config
-
       - uses: actions/download-artifact@v2
         with:
           name: bootstrap
@@ -154,9 +137,17 @@ jobs:
       - name: Bootstrapping LocalStack
         run: |
           npm run cdklocal:bootstrap
+        env:
+          DEFAULT_REGION: eu-west-1
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
 
       - name: Deploying to LocalStack
         run: |
           ls ./target/cdk
           ls ./target/cdk/release
           npm run cdklocal:deploy
+        env:
+          DEFAULT_REGION: eu-west-1
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
