@@ -89,9 +89,7 @@ jobs:
           key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
 
       - run: |
-          cargo build --release --target x86_64-unknown-linux-musl --features vendored
-          mkdir -p ./target/cdk/release
-          cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap
+          npm run build
 
       # NOTE: Artifacts are not available across workflows.
       - uses: actions/upload-artifact@v2
