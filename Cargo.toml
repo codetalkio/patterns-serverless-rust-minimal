@@ -6,6 +6,14 @@ edition = "2018"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 
+[lib]
+name = "lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bootstrap"
+path = "src/bin/bootstrap.rs"
+
 [profile.release]
 # Less code to include into binary.
 panic = 'abort'
@@ -22,14 +30,6 @@ tokio = { version = "0.2.22", features = ["macros"] }
 serde = "1.0.116"
 serde_derive = "1.0.116"
 serde_json = "1.0.57"
-# Add openssl-sys as a direct dependency so it can be cross compiled to
-# x86_64-unknown-linux-musl using the "vendored" feature below
-openssl-sys = "*"
 
 [dev-dependencies]
 pretty_assertions = "0.6.1"
-
-[features]
-# Force openssl-sys to staticly link in the openssl library. Necessary when
-# cross compiling to x86_64-unknown-linux-musl.
-vendored = ["openssl-sys/vendored"]

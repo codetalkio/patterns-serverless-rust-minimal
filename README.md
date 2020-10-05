@@ -1,7 +1,7 @@
 # Patterns: Serverless Rust (minimal) ![ci badge](https://github.com/codetalkio/patterns-serverless-rust-minimal/workflows/ci/badge.svg?branch=master)
 The following is an minimal templae for deploying a Rust AWS Lambda function. All deployment is managed by the AWS CDK tool.
 
-If you are interested in a more fully-featured version of this, check out [patterns-serverless-rust](https://github.com/codetalkio/patterns-serverless-rust) for how to expose a GraphQL endpoint and use DynamoDB.
+If you are interested in a more fully-featured version of this, check out [🚧 patterns-serverless-rust 🚧](https://github.com/codetalkio/patterns-serverless-rust) for how to expose a GraphQL endpoint and use DynamoDB.
 
 **✨ Features ✨**
 
@@ -18,7 +18,6 @@ If you are interested in a more fully-featured version of this, check out [patte
 - [Deployment using AWS CLI](#-deployment-using-aws-cli)
 - [GitHub Actions (CI/CD)](#--github-actions-cicd)
 - [Performance Traces using AWS XRay](#️️-performance-traces-using-aws-xray)
-- [Naming convention](#-naming-convention)
 - [Libraries](#-libraries)
 - [Contributing](#️-contributing)
 
@@ -26,9 +25,23 @@ If you are interested in a more fully-featured version of this, check out [patte
 
 - `npm ci`: install all our deployment dependencies.
 - `npm run build`: build the Rust executable and package it as an asset for CDK.
-- `AWS_REGION=<YOUR_REGION> npm run cdk:deploy`: deploy the packaged asset.
+- `npm run cdk:deploy`: deploy the packaged asset.
+- The stack name is controlled by the `name` field in `package.json`.
 
-Other than that, just use your regular Rust development setup.
+Other than that, just use your regular Rust development setup, and the commands below (all prefixed with `npm run`):
+
+| Command | Description | Purpose |
+|---------|-------------|---------|
+| `build` | Build the Rust executable for release | 📦 |
+| `build:archive` | Creates a `./lambda.zip` for deployment using the AWS CLI | 📦 |
+| `build:clean` | Cleans build artifcats from `target/cdk` | 📦 |
+| `deploy` | Cleans and builds a new executable, and deploys it via CDK | 📦 + 🚢 |
+| `cdk:bootstrap` | Bootstrap necessary resources on first usage of CDK in a region | 🚢 |
+| `cdk:deploy` | deploy this stack to your default AWS account/region | 🚢 |
+| `cdklocal:start` | Starts the LocalStack docker image | 👩‍💻 |
+| `cdklocal:bootstrap` | Bootstrap necessary resources for CDK against LocalStack | 👩‍💻 |
+| `cdklocal:deploy` | Deploy this stack to LocalStack | 👩‍💻 |
+
 
 ## 📦 Building
 We build our executable by running `npm run build`.
@@ -36,41 +49,38 @@ We build our executable by running `npm run build`.
 Behind the scenes, the `build` NPM script does the following:
 
 - Adds our `x86_64-unknown-linux-musl` toolchain
-- Runs `cargo build --release --target x86_64-unknown-linux-musl --features vendored`
-- Renames and moves our executable to `./target/cdk/release/bootstrap`
+- Runs `cargo build --release --target x86_64-unknown-linux-musl -Z unstable-options --out-dir target/cdk/release`
 
 
-
-In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`, rename the binary to `bootstrap`, and CDK uses that as its asset. With custom runtimes, AWS Lambda looks for an executable called `bootstrap`, so this is why we need the renaming step.
+In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`, put the executable, `bootstrap`, in `target/cdk/release`, and CDK uses that as its asset. With custom runtimes, AWS Lambda looks for an executable called `bootstrap`, so this is why we need the renaming step.
 
 ## 👩‍💻 Development using LocalStack
 
 LocalStack allows us to deploy our CDK services directly to our local environment:
 
-- `docker-compose up` to start the LocalStack services.
+- `npm run cdklocal:start` to start the LocalStack services.
 - `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
 - `npm run cdklocal:deploy` to deploy our stack.
 
 We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
 
 ## 🚢 Deployment using CDK
-We build and deploy by running `AWS_REGION=<YOUR_REGION> npm run deploy`, or just `AWS_REGION=<YOUR_REGION> npm run cdk:deploy` if you have already run `npm run build` previouslt.
+We build and deploy by running `npm run deploy`, or just `npm run cdk:deploy` if you have already run `npm run build` previouslt.
 
-A couple of quick notes:
+A couple of notes:
 
-- We require you to explicitly set the `AWS_REGION` environment variable (to avoid mistakenly deploying into some random region).
-- If this is the first CDK deployment ever on your AWS account/region, run `AWS_REGION=<YOUR_REGION> npm run cdk:bootstrap` first. This creates the necessary CDK stack resources on the cloud.
+- If this is the first CDK deployment ever on your AWS account/region, run `npm run cdk:bootstrap` first. This creates the necessary CDK stack resources on the cloud.
 - The CDK deployment bundles the `target/cdk/release` folder as its assets. This is where the `bootstrap` file needs to be located (handled by `npm run build`).
 
 
-> 💡: The rest assumes you have run `npm run build` to create the `boostrap` asset we will use to deploy our function.
+> 💡 The rest assumes you have run `npm run build` to create the `boostrap` asset we will use to deploy our function.
 
-**Deploy the Rust asset:**
+**Deploy the Rust asset**
 
-To deploy your function, call `AWS_REGION=<YOUR_REGION> npm run cdk:deploy`,
+To deploy your function, call `npm run cdk:deploy`,
 
 ```bash
-$ AWS_REGION=eu-west-1 npm run cdk:deploy
+$ npm run cdk:deploy
 ...
 sls-rust: deploying...
 [0%] start: Publishing bdbf8354358bc096823baac946ba64130b6397ff8e7eda2f18d782810e158c39:current
@@ -87,22 +97,22 @@ Stack ARN:
 arn:aws:cloudformation:eu-west-1:xxxxxxxxxxxxxx:stack/sls-rust/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx
 ```
 
-> 💡:  The security prompt is automatically disabled on CIs that set `CI=true`. You can remove this check by setting `--require-approval never` in the `cdk:deploy` npm command.
+> 💡  The security prompt is automatically disabled on CIs that set `CI=true`. You can remove this check by setting `--require-approval never` in the `cdk:deploy` npm command.
 
-**Validate you CDK CloudFormation:**
+**Validate you CDK CloudFormation**
 
 If you want to check if you CDK generated CloudFormation is valid, you can do that via,
 
 ```bash
-$ AWS_REGION=<YOUR_REGION> npm run cdk:synth
+$ npm run cdk:synth
 ```
 
-**Compare local against deployed:**
+**Compare local against deployed**
 
 And finally, if you want to see a diff between your deployed stack and your local stack,
 
 ```bash
-$ AWS_REGION=<YOUR_REGION> npm run cdk:diff
+$ npm run cdk:diff
 ```
 
 
@@ -117,22 +127,34 @@ We'll do a couple of steps additional steps for the first time setup. Only step 
 4. Invoke the function with a test payload.
 5. (Optional) Update the Lambda function with a new `lambda.zip`.
 
-> 💡: The rest assumes you have run `npm run build` followed by `npm run build:archive` to create the `lambda.zip` asset we will use to deploy our function.
+**Generate our build assets**
 
-**Set up the IAM Role:**
 ```bash
-$ aws iam create-role --role-name sls-rust-test-execution --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
+$ npm run build && npm run build:archive
+```
+
+**Set up the IAM Role**
+```bash
+$ aws iam create-role \
+  --role-name sls-rust-test-execution \
+  --assume-role-policy-document \
+  '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
 ```
 
 We also need to set some basic policies on the IAM Role for it to be invokeable and for XRay traces to work,
 ```bash
-$ aws iam attach-role-policy --role-name sls-rust-test-execution --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-$ aws iam attach-role-policy --role-name sls-rust-test-execution --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+$ aws iam attach-role-policy \
+  --role-name sls-rust-test-execution \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+$ aws iam attach-role-policy \
+  --role-name sls-rust-test-execution \
+  --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
 ```
 
-**Deploy our function:**
+**Deploy our function**
 ```bash
-$ aws lambda create-function --function-name sls-rust-test \
+$ aws lambda create-function \
+  --function-name sls-rust-test \
   --handler doesnt.matter \
   --cli-binary-format raw-in-base64-out \
   --zip-file fileb://./lambda.zip \
@@ -142,18 +164,19 @@ $ aws lambda create-function --function-name sls-rust-test \
   --tracing-config Mode=Active
 ```
 
-> 💡: You can replace the `$(aws sts get-caller-identity | jq -r .Account)` call with your AWS account ID, if you do not have [jq](https://stedolan.github.io/jq/) installed.
+> 💡 You can replace the `$(aws sts get-caller-identity | jq -r .Account)` call with your AWS account ID, if you do not have [jq](https://stedolan.github.io/jq/) installed.
 
-**Invoke our function:**
+**Invoke our function**
 ```bash
-$ aws lambda invoke --function-name sls-rust-test \
+$ aws lambda invoke \
+  --function-name sls-rust-test \
   --cli-binary-format raw-in-base64-out \
   --payload '{"firstName": "world"}' \
-  output.json > /dev/null && cat output.json && rm output.json
+  tmp-output.json > /dev/null && cat tmp-output.json && rm tmp-output.json
 {"message":"Hello, world!"}
 ```
 
-**(Optional) Update the function:**
+**(Optional) Update the function**
 We can also update the function code again, after creating a new asset `lambda.zip`,
 
 ```bash
@@ -163,7 +186,7 @@ $ aws lambda update-function-code \
     --zip-file fileb://lambda.zip
 ```
 
-**(Optional) Clean up the function:**
+**Clean up the function**
 
 ```bash
 $ aws lambda delete-function --function-name sls-rust-test
@@ -175,35 +198,21 @@ $ aws iam delete-role --role-name sls-rust-test-execution
 ## 🚗 🚀 GitHub Actions (CI/CD)
 Using [GitHub actions](/actions) allows us to have an efficient CI/CD setup with minimal work.
 
-The CI will work seamlessly without any manual steps, but for deployments via [GitHub releases](/releases) to work, you will need to set up your GitHub secrets for the repository for the following variables:
+| Workflow | Trigger | Purpose | Environment Variables |
+|----------|---------|---------|-----------------------|
+| **ci** | push | Continously test the build along with linting, formatting, best-practices (clippy), and validate deployment against LocalStack | |
+| **pre-release** | Pre-release using GitHub Releases | Deploy to a QA or staging environment |  **PRE_RELEASE_AWS_ACCESS_KEY_ID** <br /> **PRE_RELEASE_AWS_SECRET_ACCESS_KEY** <br /> **PRE_RELEASE_AWS_SECRET_ACCESS_KEY** |
+| **release** | Release using GitHub Releases | Deploy to production environment | **RELEASE_AWS_ACCESS_KEY_ID** <br /> **RELEASE_AWS_SECRET_ACCESS_KEY** <br /> **RELEASE_AWS_SECRET_ACCESS_KEY** |
 
-- **RELEASE_AWS_ACCESS_KEY_ID**
-- **RELEASE_AWS_SECRET_ACCESS_KEY**
-- **RELEASE_AWS_SECRET_ACCESS_KEY**
+The CI will work seamlessly without any manual steps, but for deployments via [GitHub Releases](/releases) to work, you will need to set up your GitHub secrets for the repository for the variables in the table above.
 
-These are used in the `.github/workflows/release.yml` workflow for deploying the CDK stack whenever a GitHub release is made.
-
-If you have a QA environment, you can also use pre-releases by adding the following additional variables:
-
-- **PRE_RELEASE_AWS_ACCESS_KEY_ID**
-- **PRE_RELEASE_AWS_SECRET_ACCESS_KEY**
-- **PRE_RELEASE_AWS_SECRET_ACCESS_KEY**
-
-which triggers the `.github/workflows/pre-release.yml` workflow instead.
+These are used in the `.github/workflows/release.yml` and `.github/workflows/pre-release.yml` workflows for deploying the CDK stack whenever a GitHub pre-release/release is made.
 
 ## 🕵️‍♀️ Performance Traces using AWS XRay
 
 Since we have enabled `tracing: lambda.Tracing.ACTIVE` in CDK and `tracing-config Mode=Active` in the CLI, we will get XRay traces for our AWS Lambda invocations.
 
 You can checkout each trace in the AWS Console inside the XRay service, which is extremely valuable for figuring our timings between services, slow AWS SDK calls, annotating cost centers in your code, and much more.
-
-## ❝ Naming convention
-
-A couple of names need to be in sync:
-
-- The stack name is specified in the `deployment/bin/stack.ts` file, in the `STACK_NAME` variable.
-- The `name` field in the `package.json` is used to target the correct stack and should match `STACK_NAME`.
-- The `name` of the Rust package in `Cargo.toml` is used in the `build:rename` NPM script to move the executable.
 
 ## 📚 Libraries
 We are using a couple of libraries, in various state of maturity/release:

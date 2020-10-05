@@ -2,9 +2,7 @@ import * as core from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
 import * as cdk from "@aws-cdk/core";
 
-interface Props {
-  region: string;
-}
+interface Props {}
 
 export class LambdaStack extends core.Stack {
   constructor(scope: cdk.App, id: string, props: Props) {

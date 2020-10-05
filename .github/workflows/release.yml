@@ -38,12 +38,6 @@ jobs:
         run: |
           npm ci
 
-      # Disabled: Artifacts are not available across workflows.
-      # - uses: actions/download-artifact@v2
-      #   with:
-      #     name: bootstrap-${{ github.sha }}
-      #     path: ./target/cdk/release
-
       - name: Install musl-tools
         run: sudo apt-get install musl-tools
       - uses: actions-rs/toolchain@v1
@@ -60,9 +54,7 @@ jobs:
           key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
 
       - run: |
-          cargo build --release --target x86_64-unknown-linux-musl --features vendored
-          # Move artifact into expected location.
-          cp ./target/x86_64-unknown-linux-musl/release/sls_rust_minimal ./target/cdk/release/bootstrap
+          npm run build
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
