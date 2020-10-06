@@ -70,7 +70,7 @@ A couple of notes:
 **Generate our build assets**
 
 ```bash
-$ npm run build && npm run build:archive
+$ npm run build
 ```
 
 **Deploy the Rust asset**
