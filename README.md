@@ -67,7 +67,11 @@ A couple of notes:
 - The CDK deployment bundles the `target/cdk/release` folder as its assets. This is where the `bootstrap` file needs to be located (handled by `npm run build`).
 
 
-> 💡 The rest assumes you have run `npm run build` to create the `boostrap` asset we will use to deploy our function.
+**Generate our build assets**
+
+```bash
+$ npm run build && npm run build:archive
+```
 
 **Deploy the Rust asset**
 
