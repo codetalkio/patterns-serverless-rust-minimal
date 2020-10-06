@@ -10,12 +10,13 @@ services:
       - "4571:4571"
       - "${PORT_WEB_UI-9888}:${PORT_WEB_UI-9888}"
     environment:
-      - SERVICES=${SERVICES-cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway}
+      - SERVICES=${SERVICES-serverless,cloudformation,iam,sts,sqs,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway}
       - DEFAULT_REGION=${DEFAULT_REGION-eu-west-1}
       - DEBUG=${DEBUG- }
       - DATA_DIR=${DATA_DIR- }
       - PORT_WEB_UI=${PORT_WEB_UI-9888}
       - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
+      - LAMBDA_REMOTE_DOCKER=${LAMBDA_REMOTE_DOCKER-false}
       - KINESIS_ERROR_PROBABILITY=${KINESIS_ERROR_PROBABILITY- }
       - DOCKER_HOST=unix:///var/run/docker.sock
       - HOST_TMP_FOLDER=${TMPDIR}

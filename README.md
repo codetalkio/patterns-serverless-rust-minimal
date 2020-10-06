@@ -7,8 +7,11 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 
 - 🦀 Ready-to-use serverless setup using Rust and [AWS CDK](https://github.com/aws/aws-cdk).
 - 🚗 CI using [GitHub Actions](https://github.com/features/actions).
-- 👩‍💻 Testing of deployment in CI using [LocalStack](https://github.com/localstack/localstack).
+- 👩‍💻 Testing of deployment in CI using [LocalStack](https://github.com/localstack/localstack). (🚧 Work in progresss 🚧)
 - 🚀 Deployments via [GitHub Releases](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-releases).
+
+<img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
+
 
 ### Overview
 
@@ -16,6 +19,7 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 - [Building](#-building)
 - [Deployment using CDK](#-deployment-using-cdk)
 - [Deployment using AWS CLI](#-deployment-using-aws-cli)
+- [Development using LocalStack](#-development-using-localstack)
 - [GitHub Actions (CI/CD)](#--github-actions-cicd)
 - [Performance Traces using AWS XRay](#️️-performance-traces-using-aws-xray)
 - [Libraries](#-libraries)
@@ -53,16 +57,6 @@ Behind the scenes, the `build` NPM script does the following:
 
 
 In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`, put the executable, `bootstrap`, in `target/cdk/release`, and CDK uses that as its asset. With custom runtimes, AWS Lambda looks for an executable called `bootstrap`, so this is why we need the renaming step.
-
-## 👩‍💻 Development using LocalStack
-
-LocalStack allows us to deploy our CDK services directly to our local environment:
-
-- `npm run cdklocal:start` to start the LocalStack services.
-- `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
-- `npm run cdklocal:deploy` to deploy our stack.
-
-We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
 
 ## 🚢 Deployment using CDK
 We build and deploy by running `npm run deploy`, or just `npm run cdk:deploy` if you have already run `npm run build` previouslt.
@@ -195,6 +189,45 @@ $ aws iam detach-role-policy --role-name sls-rust-test-execution --policy-arn ar
 $ aws iam delete-role --role-name sls-rust-test-execution
 ```
 
+## 👩‍💻 Development using LocalStack
+
+🚧 Work in progresss 🚧
+
+LocalStack allows us to deploy our CDK services directly to our local environment:
+
+- `npm run cdklocal:start` to start the LocalStack services.
+- `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
+- `npm run cdklocal:deploy` to deploy our stack.
+
+We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
+
+Currently it seems `npm run cdklocal:deploy` doesn't create the actual Lambda, so a way to set it up at the moment is,
+
+```bash
+$ aws --endpoint-url=http://localhost:4566 lambda create-function \
+  --function-name sls-rust-minimal \
+  --handler doesnt.matter \
+  --cli-binary-format raw-in-base64-out \
+  --code S3Bucket="__local__",S3Key="$(pwd)/target/cdk/release" \
+  --runtime provided \
+  --role arn:aws:iam::000000000000:role/sls-rust-test-execution \
+  --environment Variables={RUST_BACKTRACE=1} \
+  --tracing-config Mode=Active
+```
+
+This mounts the `./target/cdk/release` directory. Whenever we update the `bootstrap` executable in here (still targeting `x86_64-unknown-linux-musl`) , it will be reflected in the Lambda function.
+
+We can then invoke it from our applications or via,
+
+```bash
+$ aws --endpoint-url=http://localhost:4566 lambda invoke \
+  --function-name sls-rust-minimal \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"firstName": "world"}' \
+  tmp-output.json > /dev/null && cat tmp-output.json && rm tmp-output.json
+{"message":"Hello, world!"}
+```
+
 ## 🚗 🚀 GitHub Actions (CI/CD)
 Using [GitHub actions](/actions) allows us to have an efficient CI/CD setup with minimal work.
 
@@ -218,9 +251,7 @@ You can checkout each trace in the AWS Console inside the XRay service, which is
 We are using a couple of libraries, in various state of maturity/release:
 
 - The master branch of [aws-lambda-rust-runtime](https://github.com/awslabs/aws-lambda-rust-runtime) pending on [#216](https://github.com/awslabs/aws-lambda-rust-runtime/issues/216) ([README from PR](https://github.com/awslabs/aws-lambda-rust-runtime/blob/5d50e1ca29b20fccaf85074a6904fa4b6ece4f05/README.md)) to be finalised for official async/await support.
-  - To statically build you might also need OpenSSL development headers, but we let the [openssl-sys package manage that](https://github.com/sfackler/rust-openssl/issues/980) for us with a `openssl-sys/vendored`.
   - We will need the musl tools, which we use instead of glibc, via `apt-get install musl-tools` for Ubuntu or `brew tap SergioBenitez/osxct && brew install FiloSottile/musl-cross/musl-cross` for macOS.
-  - We need zip to create our deployment package when using the CLI, `apt-get install zip`.
 - [aws-cdk](https://docs.aws.amazon.com/cdk/latest/guide/home.html) for deploying to AWS, using CloudFormation under-the-hood. We'll use their support for [Custom Runtimes](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-readme.html).
 - The [aws-cdk fork](https://github.com/localstack/aws-cdk) of [localstack](https://github.com/localstack/localstack) for a local development setup.
 - [cargo watch](https://github.com/passcod/cargo-watch) so we can develop using `cargo watch`, installable via `cargo install cargo-watch`.

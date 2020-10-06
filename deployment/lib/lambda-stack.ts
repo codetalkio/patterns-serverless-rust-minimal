@@ -1,5 +1,6 @@
 import * as core from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
+import * as s3 from "@aws-cdk/aws-s3";
 import * as cdk from "@aws-cdk/core";
 
 interface Props {}
@@ -17,7 +18,7 @@ export class LambdaStack extends core.Stack {
       runtime: lambda.Runtime.PROVIDED,
       handler: `${id}`, // The handler value syntax is `{cargo-package-name}.{bin-name}`.
       code: lambda.Code.fromAsset(`${__dirname}/../../target/cdk/release`),
-      memorySize: 128,
+      memorySize: 256,
       timeout: cdk.Duration.seconds(10),
       tracing: lambda.Tracing.ACTIVE,
     });

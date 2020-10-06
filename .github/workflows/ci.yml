@@ -106,7 +106,7 @@ jobs:
       localstack:
         image: localstack/localstack:latest
         env:
-          SERVICES: cloudformation,iam,sts,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
+          SERVICES: serverless,cloudformation,iam,sts,sqs,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
           DEFAULT_REGION: eu-west-1
           AWS_ACCESS_KEY_ID: localkey
           AWS_SECRET_ACCESS_KEY: localsecret
