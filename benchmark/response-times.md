@@ -58,3 +58,11 @@ The following are the response time results from AWS XRay, generated after runni
 | 99.9 ms |  | 20.1 ms | 60.4 ms |  | 🥵 |
 | 7.9 ms |  | 0.4 ms | 0.3 ms |  | 🥵 |
 | 9 ms |  | 0.3 ms | 0.2 ms |  | 🥵 |
+
+## XRay Example of a Cold Start
+
+<img width="1476" alt="Screenshot 2020-10-07 at 23 01 40" src="https://user-images.githubusercontent.com/1189998/95387505-178a1d00-08f1-11eb-83a7-7bc32eee48e2.png">
+
+## XRay Example of a Warm Start
+
+<img width="1479" alt="Screenshot 2020-10-07 at 23 01 23" src="https://user-images.githubusercontent.com/1189998/95387509-1953e080-08f1-11eb-8d46-ac25efa235e4.png">

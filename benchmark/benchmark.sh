@@ -12,42 +12,38 @@ benchmarkStartTime=$(date +%s)
 
 echo "----- The benchmark will be run on AWS Account $awsAccountId with benchmark suffix $benchmarkSuffix -----"
 
-if [[ $SKIP_SETUP != "" ]]; then
-  echo "[SETUP] Skipping enabled, going straight to benchmarks."
-else
-  ##############################################################################
-  #                   Prepare our assets for deployment                        #
-  ##############################################################################
-  echo "[Build] Building the asset."
-  npm run build
+##############################################################################
+#                   Prepare our assets for deployment                        #
+##############################################################################
+echo "[Build] Building the asset."
+npm run build
 
-  echo "[Build] Making asset ready to deploy using AWS CLI."
-  npm run build:archive
+echo "[Build] Making asset ready to deploy using AWS CLI."
+npm run build:archive
 
-  ##############################################################################
-  #                   Prepare our deployment resources                         #
-  ##############################################################################
-  echo "[Deployment] Settup up IAM role."
-  aws iam create-role \
-    --role-name sls-benchmark-execution \
-    --assume-role-policy-document \
-    '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}' > /dev/null
+##############################################################################
+#                   Prepare our deployment resources                         #
+##############################################################################
+echo "[Deployment] Settup up IAM role."
+aws iam create-role \
+  --role-name sls-benchmark-execution \
+  --assume-role-policy-document \
+  '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}' > /dev/null
 
-  echo "[Deployment] Attaching IAM policies."
-  aws iam attach-role-policy \
-    --role-name sls-benchmark-execution \
-    --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole > /dev/null
-  aws iam attach-role-policy \
-    --role-name sls-benchmark-execution \
-    --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess > /dev/null
+echo "[Deployment] Attaching IAM policies."
+aws iam attach-role-policy \
+  --role-name sls-benchmark-execution \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole > /dev/null
+aws iam attach-role-policy \
+  --role-name sls-benchmark-execution \
+  --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess > /dev/null
 
-  echo -n "[Deployment] Waiting 10 seconds for the IAM policies to update."
-  for i in {1..10}; do
-    echo -n "."
-    sleep 1
-  done
-  echo ""
-fi
+echo -n "[Deployment] Waiting 10 seconds for the IAM policies to update."
+for i in {1..10}; do
+  echo -n "."
+  sleep 1
+done
+echo ""
 
 echo "[Deployment] Creating Lambda function 'sls-benchmark-$benchmarkSuffix'."
 aws lambda create-function \
@@ -141,7 +137,17 @@ if [[ $tracesProcessed != 4 ]]; then
   npm run ts-node -- ./benchmark/post-process.ts >> ./benchmark/response-times.md
 fi
 
-echo "" >> ./benchmark/response-times.md
+cat >> ./benchmark/response-times.md << 'EOF'
+
+## XRay Example of a Cold Start
+
+<img width="1476" alt="Screenshot 2020-10-07 at 23 01 40" src="https://user-images.githubusercontent.com/1189998/95387505-178a1d00-08f1-11eb-83a7-7bc32eee48e2.png">
+
+## XRay Example of a Warm Start
+
+<img width="1479" alt="Screenshot 2020-10-07 at 23 01 23" src="https://user-images.githubusercontent.com/1189998/95387509-1953e080-08f1-11eb-8d46-ac25efa235e4.png">
+
+EOF
 
 ##############################################################################
 #                     Finally, clean up our resources                        #
@@ -151,10 +157,10 @@ if [[ $ONLY_POST_PROCESS == "" ]]; then
   echo "[Cleanup] Deleting function 'sls-benchmark-$benchmarkSuffix'."
   aws lambda delete-function --function-name "sls-benchmark-$benchmarkSuffix" > /dev/null
   echo "[Cleanup] Detaching policies."
-  # aws iam detach-role-policy --role-name sls-benchmark-execution --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole > /dev/null
-  # aws iam detach-role-policy --role-name sls-benchmark-execution --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess > /dev/null
+  aws iam detach-role-policy --role-name sls-benchmark-execution --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole > /dev/null
+  aws iam detach-role-policy --role-name sls-benchmark-execution --policy-arn arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess > /dev/null
   echo "[Cleanup] Deleting role."
-  # aws iam delete-role --role-name sls-benchmark-execution > /dev/null
+  aws iam delete-role --role-name sls-benchmark-execution > /dev/null
 fi
 
 echo ""
