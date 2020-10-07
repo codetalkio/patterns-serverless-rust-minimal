@@ -29,8 +29,10 @@ jobs:
           key: node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             node-
-      - uses: .github/actions/setup-node-deps
-      - uses: .github/actions/build-asset
+      - name: "Setup node dependencies"
+        uses: .github/actions/setup-node-deps
+      - name: "Build asset"
+        uses: .github/actions/build-asset
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY

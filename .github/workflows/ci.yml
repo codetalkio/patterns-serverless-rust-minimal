@@ -74,7 +74,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/build-asset
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2020-08-28
+          override: true
+          components: clippy
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: "Build asset"
+        uses: ./.github/actions/build-asset
       # NOTE: Artifacts are not available across workflows.
       - uses: actions/upload-artifact@v2
         with:
@@ -110,7 +123,8 @@ jobs:
           key: node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             node-
-      - uses: ./.github/actions/setup-node-deps
+      - name: "Setup node dependencies"
+        uses: ./.github/actions/setup-node-deps
 
       - uses: actions/download-artifact@v2
         with:
