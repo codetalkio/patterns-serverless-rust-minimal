@@ -1,7 +1,9 @@
-steps:
-  - uses: ./.github/actions/setup-build-deps
-  - name: Install musl-tools
-    run: |
-      sudo apt-get install musl-tools
-  - run: |
-      npm run build
+runs:
+  using: "composite"
+  steps:
+    - uses: ./.github/actions/setup-build-deps
+    - name: Install musl-tools
+      run: |
+        sudo apt-get install musl-tools
+    - run: |
+        npm run build

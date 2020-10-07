@@ -1,13 +1,15 @@
-steps:
-  - uses: actions-rs/toolchain@v1
-    with:
-      toolchain: nightly-2020-08-28
-      override: true
-      components: clippy
-  - uses: actions/cache@v2
-    with:
-      path: |
-        ~/.cargo/registry
-        ~/.cargo/git
-        target
-      key: cargo-${{ hashFiles('**/Cargo.lock') }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly-2020-08-28
+        override: true
+        components: clippy
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: cargo-${{ hashFiles('**/Cargo.lock') }}
