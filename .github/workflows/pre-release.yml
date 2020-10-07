@@ -18,6 +18,17 @@ jobs:
           echo "Checking tag: $GITHUB_REF"
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
+      - name: Setup Node.js 14.12.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.12.0"
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-
       - uses: .github/actions/setup-node-deps
       - uses: .github/actions/build-asset
 
