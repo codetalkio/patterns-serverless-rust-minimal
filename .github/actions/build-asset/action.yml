@@ -1,7 +1,13 @@
-steps:
-  - uses: ./.github/actions/setup-build-deps
-  - name: Install musl-tools
-    run: |
-      sudo apt-get install musl-tools
-  - run: |
-      npm run build
+name: "Build asset"
+description: "Build the asset required for deployment"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install musl-tools
+      run: |
+        sudo apt-get install musl-tools
+      shell: bash
+    - run: |
+        npm run build
+      shell: bash
