@@ -18,43 +18,8 @@ jobs:
           echo "Checking tag: $GITHUB_REF"
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
-      - name: Setup Node.js 14.12.0
-        uses: actions/setup-node@v1
-        with:
-          node-version: "14.12.0"
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            node-
-
-      - name: Upgrade NPM to 6.14.8
-        run: |
-          npm i -g npm@6.14.8
-
-      - name: "Install dependencies"
-        run: |
-          npm ci
-
-      - name: Install musl-tools
-        run: sudo apt-get install musl-tools
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly-2020-08-28
-          override: true
-          target: x86_64-unknown-linux-musl
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-${{ hashFiles('**/Cargo.lock') }}-release
-
-      - run: |
-          npm run build
+      - uses: ./.github/actions/setup-node-deps
+      - uses: ./.github/actions/build-asset
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY

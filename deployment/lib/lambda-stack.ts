@@ -15,7 +15,7 @@ export class LambdaStack extends core.Stack {
     const entry = new lambda.Function(this, entryId, {
       functionName: entryFnName,
       description: "Rust serverless minimal microservice",
-      runtime: lambda.Runtime.PROVIDED,
+      runtime: lambda.Runtime.PROVIDED_AL2,
       handler: `${id}`, // The handler value syntax is `{cargo-package-name}.{bin-name}`.
       code: lambda.Code.fromAsset(`${__dirname}/../../target/cdk/release`),
       memorySize: 256,
