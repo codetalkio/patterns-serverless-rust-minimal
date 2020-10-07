@@ -251,6 +251,10 @@ Since we have enabled `tracing: lambda.Tracing.ACTIVE` in CDK and `tracing-confi
 
 You can checkout each trace in the AWS Console inside the XRay service, which is extremely valuable for figuring our timings between services, slow AWS SDK calls, annotating cost centers in your code, and much more.
 
+We can benchmark our performance using `npm run benchmark`, which will deploy the AWS Lambda to your AWS account, invoke it a bunch of times and trigger cold starts, along with gathering up all the AWS XRay traces into a neat table.
+
+Check out [the response-times table](./benchmark/response-times.md) for a the output of `npm run benchmark`.
+
 ## 📚 Libraries
 We are using a couple of libraries, in various state of maturity/release:
 

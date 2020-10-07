@@ -15,6 +15,7 @@
     "build": "npm run build:clean && rustup target add x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl -Z unstable-options --out-dir target/cdk/release",
     "build:archive": "(cd ./target/cdk/release/ && zip ./lambda.zip ./bootstrap) && mv ./target/cdk/release/lambda.zip ./lambda.zip",
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
+    "benchmark": "./benchmark/benchmark.sh",
     "cdk:synth": "cdk synth # emits the synthesized CloudFormation template",
     "cdk:diff": "cdk diff # compare deployed stack with current state",
     "cdk:deploy": "[[ $CI == 'true' ]] && CDK_APPROVAL='never' || CDK_APPROVAL='broadening'; cdk deploy --require-approval $CDK_APPROVAL $npm_package_name",
@@ -22,7 +23,8 @@
     "cdklocal:start": "docker-compose up",
     "cdklocal:clear-cache": "(rm ~/.cdk/cache/accounts.json || true) && (rm ~/.cdk/cache/accounts_partitions.json || true)",
     "cdklocal:deploy": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal deploy --require-approval never $npm_package_name",
-    "cdklocal:bootstrap": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal bootstrap aws://000000000000/eu-west-1"
+    "cdklocal:bootstrap": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal bootstrap aws://000000000000/eu-west-1",
+    "ts-node": "ts-node"
   },
   "dependencies": {},
   "devDependencies": {
