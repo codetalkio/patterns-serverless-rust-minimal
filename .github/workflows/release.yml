@@ -18,8 +18,8 @@ jobs:
           echo "Checking tag: $GITHUB_REF"
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
-      - uses: ./.github/actions/setup-node-deps
-      - uses: ./.github/actions/build-asset
+      - uses: .github/actions/setup-node-deps
+      - uses: .github/actions/build-asset
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
