@@ -18,8 +18,21 @@ jobs:
           echo "Checking tag: $GITHUB_REF"
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
-      - uses: ./.github/actions/setup-node-deps
-      - uses: ./.github/actions/build-asset
+      - name: Setup Node.js 14.12.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.12.0"
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            node-
+      - name: "Setup node dependencies"
+        uses: .github/actions/setup-node-deps
+      - name: "Build asset"
+        uses: .github/actions/build-asset
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
