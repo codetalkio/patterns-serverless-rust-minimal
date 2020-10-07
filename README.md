@@ -21,7 +21,7 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 - [Deployment using AWS CLI](#-deployment-using-aws-cli)
 - [Development using LocalStack](#-development-using-localstack)
 - [GitHub Actions (CI/CD)](#--github-actions-cicd)
-- [Performance Traces using AWS XRay](#️️-performance-traces-using-aws-xray)
+- [Benchmarks using AWS XRay](#️️-benchmarks-using-aws-xray)
 - [Libraries](#-libraries)
 - [Contributing](#️-contributing)
 
@@ -245,7 +245,7 @@ The CI will work seamlessly without any manual steps, but for deployments via [G
 
 These are used in the `.github/workflows/release.yml` and `.github/workflows/pre-release.yml` workflows for deploying the CDK stack whenever a GitHub pre-release/release is made.
 
-## 🕵️‍♀️ Performance Traces using AWS XRay
+## 🕵️‍♀️ Benchmarks using AWS XRay
 
 Since we have enabled `tracing: lambda.Tracing.ACTIVE` in CDK and `tracing-config Mode=Active` in the CLI, we will get XRay traces for our AWS Lambda invocations.
 
