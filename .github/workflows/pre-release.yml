@@ -39,6 +39,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.RELEASE_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.RELEASE_AWS_REGION }}
+          CI: "true"
         run: |
-          AWS_REGION=$AWS_DEFAULT_REGION npm run cdk:deploy
+          npm run cdk:deploy

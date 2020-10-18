@@ -51,7 +51,7 @@ aws lambda create-function \
   --handler doesnt.matter \
   --cli-binary-format raw-in-base64-out \
   --zip-file fileb://./lambda.zip \
-  --runtime provided \
+  --runtime provided.al2 \
   --role "arn:aws:iam::$awsAccountId:role/sls-benchmark-execution" \
   --tracing-config Mode=Active > /dev/null
 
@@ -126,7 +126,7 @@ for t in $responseTimes; do
   if [[ $tracesProcessed == 4 ]]; then
     echo "[Benchmark] Fetching a batch of XRay traces."
     aws xray batch-get-traces --no-paginate --trace-ids $traceIds > ./benchmark/traces.json
-    npm run ts-node -- ./benchmark/post-process.ts >> ./benchmark/response-times.md
+    npm run --silent ts-node -- ./benchmark/post-process.ts >> ./benchmark/response-times.md
     traceIds=""
     tracesProcessed=0
   fi
@@ -134,7 +134,7 @@ done
 if [[ $tracesProcessed != 4 ]]; then
   echo "[Benchmark] Fetching a batch of XRay traces."
   aws xray batch-get-traces --no-paginate --trace-ids $traceIds > ./benchmark/traces.json
-  npm run ts-node -- ./benchmark/post-process.ts >> ./benchmark/response-times.md
+  npm run --silent ts-node -- ./benchmark/post-process.ts >> ./benchmark/response-times.md
 fi
 
 cat >> ./benchmark/response-times.md << 'EOF'

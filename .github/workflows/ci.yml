@@ -1,7 +1,12 @@
 name: ci
 
 # Check out https://help.github.com/en/articles/workflow-syntax-for-github-actions for documentation on Actions.
-on: push
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "*.*"
 
 jobs:
   lint:

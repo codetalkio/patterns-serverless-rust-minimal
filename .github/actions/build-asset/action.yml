@@ -4,10 +4,18 @@ description: "Build the asset required for deployment"
 runs:
   using: "composite"
   steps:
+    # Convert /bin/sh to /bin/bash.
+    - run: |
+        sudo mv /bin/sh /bin/sh-dash
+        sudo ln -s /bin/bash /bin/sh
+      shell: bash
+
+    # Set up our tools.
     - name: Install musl-tools
       run: |
         sudo apt-get install musl-tools
       shell: bash
+    # Run the actual build.
     - run: |
         npm run build
       shell: bash
