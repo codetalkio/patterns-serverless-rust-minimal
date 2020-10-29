@@ -1,6 +1,5 @@
 import * as core from "@aws-cdk/core";
 import * as lambda from "@aws-cdk/aws-lambda";
-import * as s3 from "@aws-cdk/aws-s3";
 import * as cdk from "@aws-cdk/core";
 
 interface Props {}
@@ -36,16 +35,5 @@ export class LambdaStack extends core.Stack {
       exportName: `${entryFnName}-function-arn`,
       value: entry.functionArn,
     });
-
-    // Optionally: Keep the lambda function warm by pinging `concurrencyNumber` of it every 5 minutes (this will obvisouly cost a tiny, tiny bit).
-    // const concurrencyNumber = 5;
-    // const warmer = new cdkEvents.Rule(this, "Warmer", {
-    //   schedule: cdkEvents.Schedule.expression("rate(5 minutes)"),
-    // });
-    // warmer.addTarget(
-    //   new cdkEventTargets.LambdaFunction(entry, {
-    //     event: cdkEvents.RuleTargetInput.fromObject({ warmer: true, concurrency: concurrencyNumber }),
-    //   })
-    // );
   }
 }
