@@ -22,8 +22,8 @@
     "cdk:bootstrap": "cdk bootstrap aws://$(aws sts get-caller-identity | jq -r .Account)/$AWS_REGION",
     "cdklocal:start": "docker-compose up",
     "cdklocal:clear-cache": "(rm ~/.cdk/cache/accounts.json || true) && (rm ~/.cdk/cache/accounts_partitions.json || true)",
-    "cdklocal:deploy": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal deploy --require-approval never $npm_package_name",
-    "cdklocal:bootstrap": "npm run --silent cdklocal:clear-cache && AWS_REGION=eu-west-1 cdklocal bootstrap aws://000000000000/eu-west-1",
+    "cdklocal:deploy": "npm run --silent cdklocal:clear-cache && CDK_LOCAL=true AWS_REGION=eu-west-1 cdklocal deploy --require-approval never $npm_package_name",
+    "cdklocal:bootstrap": "npm run --silent cdklocal:clear-cache && CDK_LOCAL=true AWS_REGION=eu-west-1 cdklocal bootstrap aws://000000000000/eu-west-1",
     "ts-node": "ts-node"
   },
   "dependencies": {},

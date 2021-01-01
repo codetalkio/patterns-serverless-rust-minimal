@@ -205,21 +205,6 @@ We can now target the local services with `cdklocal` or by setting the `endpoint
 
 This mounts the `./target/cdk/release` directory. Whenever we update the `bootstrap` executable in here (still targeting `x86_64-unknown-linux-musl`) , it will be reflected in the Lambda function.
 
-🚧 **Unfortunately, we currently need one manual step after the first deployment:** 🚧
-
-```bash
-$ npm run cdklocal:deploy
-$ aws --endpoint-url=http://localhost:4566 lambda update-function-code \
-  --cli-binary-format raw-in-base64-out \
-  --function-name sls-rust-minimal-main \
-  --s3-bucket "__local__" \
-  --s3-key "$(pwd)/target/cdk/release"
-```
-
-We effectively run the deployment as normal, and then update the Lambda to correctly mount the `./target/cdk/release` folder.
-
- 🚧 Related to [localstack#3086](https://github.com/localstack/localstack/issues/3086) 🚧
-
 We can then invoke it from our applications or via the AWS CLI,
 
 ```bash
