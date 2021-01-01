@@ -16,9 +16,8 @@ Assuming you have set up npm and cargo/rustup, the following will get you going:
 - `npm ci`: install all our deployment dependencies.
 - `npm run build`: build the Rust executable and package it as an asset for CDK.
 - `npm run cdk:deploy`: deploy the packaged asset.
-- The stack name is controlled by the `name` field in `package.json`.
 
-Other than that, just use your regular Rust development setup.
+The stack name is controlled by the `name` field in `package.json`. Other than that, just use your regular Rust development setup.
 
 <img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
 
