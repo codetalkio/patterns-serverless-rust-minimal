@@ -13,6 +13,17 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 <img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
 
 
+## ⚡️ Quick start
+
+Assuming you have set up npm and cargo/rustup, the following will get you going:
+
+- `npm ci`: install all our deployment dependencies.
+- `npm run build`: build the Rust executable and package it as an asset for CDK.
+- `npm run cdk:deploy`: deploy the packaged asset.
+- The stack name is controlled by the `name` field in `package.json`.
+
+Other than that, just use your regular Rust development setup.
+
 ### Overview
 
 - [Quick start](#️-quick-start)
@@ -24,20 +35,12 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 - [Libraries](#-libraries)
 - [Contributing](#️-contributing)
 
-## ⚡️ Quick start
-
-Assuming you have set up npm and cargo/rustup, the following will get you going:
-
-- `npm ci`: install all our deployment dependencies.
-- `npm run build`: build the Rust executable and package it as an asset for CDK.
-- `npm run cdk:deploy`: deploy the packaged asset.
-- The stack name is controlled by the `name` field in `package.json`.
-
-Other than that, just use your regular Rust development setup, and the commands below (all prefixed with `npm run`):
+An overview of commands (all prefixed with `npm run`):
 
 | Command | Description | Purpose |
 |---------|-------------|---------|
 | `build` | Build the Rust executable for release | 📦 |
+| `build:debug` | Build the Rust executable for debug | 📦 |
 | `build:archive` | Creates a `./lambda.zip` for deployment using the AWS CLI | 📦 |
 | `build:clean` | Cleans build artifcats from `target/cdk` | 📦 |
 | `deploy` | Cleans and builds a new executable, and deploys it via CDK | 📦 + 🚢 |
