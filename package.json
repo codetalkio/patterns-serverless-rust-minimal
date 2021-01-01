@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "deploy": "npm run build && npm run cdk:deploy",
-    "build": "npm run build:clean && rustup target add x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl -Z unstable-options --out-dir target/cdk/release",
+    "build": "npm run build:clean && rustup target add x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl && mkdir -p ./target/cdk/release && mv ./target/x86_64-unknown-linux-musl/release/bootstrap ./target/cdk/release/bootstrap",
     "build:archive": "(cd ./target/cdk/release/ && zip ./lambda.zip ./bootstrap) && mv ./target/cdk/release/lambda.zip ./lambda.zip",
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
     "benchmark": "./benchmark/benchmark.sh",
@@ -28,14 +28,14 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "aws-cdk-local": "1.65.0",
-    "aws-cdk": "1.70.0",
-    "@aws-cdk/core": "1.70.0",
-    "@aws-cdk/assert": "1.70.0",
-    "@aws-cdk/aws-lambda": "1.70.0",
+    "aws-cdk-local": "1.65.2",
+    "aws-cdk": "1.76.0",
+    "@aws-cdk/core": "1.76.0",
+    "@aws-cdk/assert": "1.76.0",
+    "@aws-cdk/aws-lambda": "1.76.0",
     "@types/node": "14.11.2",
-    "ts-node": "9.0.0",
+    "ts-node": "9.1.1",
     "tsconfig-paths": "3.9.0",
-    "typescript": "4.0.3"
+    "typescript": "4.1.3"
   }
 }

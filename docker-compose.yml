@@ -3,14 +3,14 @@ version: "2.1"
 services:
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
-    image: localstack/localstack
+    image: localstack/localstack:0.12.4
     network_mode: bridge
     ports:
       - "4566:4566"
       - "4571:4571"
       - "${PORT_WEB_UI-9888}:${PORT_WEB_UI-9888}"
     environment:
-      - SERVICES=${SERVICES-serverless,cloudformation,iam,sts,sqs,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway}
+      - SERVICES=${SERVICES-serverless,cloudfront,cloudformation,iam,sts,sqs,ssm,s3,route53,acm,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway}
       - DEFAULT_REGION=${DEFAULT_REGION-eu-west-1}
       - DEBUG=${DEBUG- }
       - DATA_DIR=${DATA_DIR- }
