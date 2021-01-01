@@ -113,8 +113,8 @@ cat > ./benchmark/response-times.md << 'EOF'
 
 The following are the response time results from AWS XRay, generated after running `npm run benchmark`.
 
-| Response time | Initialization | Invocation | Overhead | Cold Start | Warm Start |
-|---------------|----------------|------------|----------|------------|------------|
+| Response time | Initialization | Invocation | Overhead | Cold/ Warm Start |
+|---------------|----------------|------------|----------|------------------|
 EOF
 
 responseTimes=$(cat ./benchmark/trace-summaries.json | jq -c -r '.TraceSummaries | .[] | .Id')

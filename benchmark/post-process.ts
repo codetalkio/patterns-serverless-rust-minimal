@@ -41,11 +41,21 @@ interface Document {
 }
 
 const main = () => {
+  // Gather overall metrics.
+  let avgWarmMs: number | undefined;
+  let avgColdMs: number | undefined;
+  let fastestWarmMs: number | undefined;
+  let fastestColdMs: number | undefined;
+  let slowestWarmMs: number | undefined;
+  let slowestColdMs: number | undefined;
+
+  // Gather per-trace metrics.
   (traces as Traces).Traces?.map((trace) => {
     let totalTime: number | undefined;
     let initTime: number | undefined;
     let invocTime: number | undefined;
     let overheadTime: number | undefined;
+
     // Piece together the segment timings into one measurement.
     trace.Segments?.map((segment) => {
       const seg: Document = JSON.parse(segment.Document);
@@ -64,24 +74,37 @@ const main = () => {
       }
     });
 
-    const totalTimeMs = totalTime
-      ? `${Math.floor(totalTime * 10000) / 10} ms`
-      : "";
-    const initTimeMs = initTime
-      ? `${Math.floor(initTime * 10000) / 10} ms`
-      : "";
-    const invocTimeMs = invocTime
-      ? `${Math.floor(invocTime * 10000) / 10} ms`
-      : "";
-    const overheadTimeMs = overheadTime
-      ? `${Math.floor(overheadTime * 10000) / 10} ms`
-      : "";
-    const coldStart = initTimeMs ? "🥶" : "";
-    const warmStart = initTimeMs ? "" : "🥵";
-    console.log(
-      `| ${totalTimeMs} | ${initTimeMs} | ${invocTimeMs} | ${overheadTimeMs} | ${coldStart} | ${warmStart} |`
-    );
+    const totalTimeMs = `${Math.floor(totalTime! * 10000) / 10} ms`;
+    const initTimeMs = initTime ? `${Math.floor(initTime * 10000) / 10} ms` : "";
+    const invocTimeMs = invocTime ? `${Math.floor(invocTime * 10000) / 10} ms` : "";
+    const overheadTimeMs = overheadTime ? `${Math.floor(overheadTime * 10000) / 10} ms` : "";
+    const isColdStart = !!initTimeMs;
+    const coldOrWarmStart = isColdStart ? "🥶" : "🥵";
+    console.log(`| ${totalTimeMs} | ${initTimeMs} | ${invocTimeMs} | ${overheadTimeMs} | ${coldOrWarmStart} |`);
+
+    if (!isColdStart) {
+      avgWarmMs = !avgWarmMs ? totalTime : (avgWarmMs + totalTime!) / 2;
+      fastestWarmMs = !fastestWarmMs || totalTime! < fastestWarmMs ? totalTime : fastestWarmMs;
+      slowestWarmMs = !slowestWarmMs || totalTime! > slowestWarmMs ? totalTime : slowestWarmMs;
+    }
+    if (isColdStart) {
+      avgColdMs = !avgColdMs ? totalTime : (avgColdMs + totalTime!) / 2;
+      fastestColdMs = !fastestColdMs || totalTime! < fastestColdMs ? totalTime : fastestColdMs;
+      slowestColdMs = !slowestColdMs || totalTime! > slowestColdMs ? totalTime : slowestColdMs;
+    }
   });
+
+  //   console.log(`
+
+  // | Measurement | Time (ms) |
+  // |-------------|------|
+  // | Average warm start response time | ${Math.floor(avgWarmMs! * 10000) / 10} ms |
+  // | Average cold start response time | ${Math.floor(avgColdMs! * 10000) / 10} ms |
+  // | Fastest warm response time | ${Math.floor(fastestWarmMs! * 10000) / 10} ms |
+  // | Slowest warm response time | ${Math.floor(slowestWarmMs! * 10000) / 10} ms |
+  // | Fastest cold response time  | ${Math.floor(fastestColdMs! * 10000) / 10} ms |
+  // | Slowest cold response time | ${Math.floor(slowestColdMs! * 10000) / 10} ms |
+  // `);
 };
 
 main();
