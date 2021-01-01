@@ -1,8 +1,6 @@
 # Patterns: Serverless Rust (minimal) ![ci badge](https://github.com/codetalkio/patterns-serverless-rust-minimal/workflows/ci/badge.svg?branch=master)
 The following is an minimal template for deploying a Rust AWS Lambda function. All deployment is managed by the AWS CDK tool.
 
-If you are interested in a more fully-featured version of this, check out [🚧 patterns-serverless-rust 🚧](https://github.com/codetalkio/patterns-serverless-rust) for how to expose a GraphQL endpoint and use DynamoDB.
-
 **✨ Features ✨**
 
 - 🦀 Ready-to-use serverless setup using Rust and [AWS CDK](https://github.com/aws/aws-cdk).
@@ -22,9 +20,9 @@ Assuming you have set up npm and cargo/rustup, the following will get you going:
 
 Other than that, just use your regular Rust development setup.
 
-Use this repo as a template to get quickly started!
-
 <img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
+
+Use this repo as a template to get quickly started! If you are interested in a more fully-featured version of this, check out [🚧 patterns-serverless-rust 🚧](https://github.com/codetalkio/patterns-serverless-rust) for how to expose a GraphQL endpoint and use DynamoDB.
 
 ### Overview
 
