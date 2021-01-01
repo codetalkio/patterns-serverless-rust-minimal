@@ -53,7 +53,7 @@ We build our executable by running `npm run build`.
 Behind the scenes, the `build` NPM script does the following:
 
 - Adds our `x86_64-unknown-linux-musl` toolchain
-- Runs `cargo build --release --target x86_64-unknown-linux-musl -Z unstable-options --out-dir target/cdk/release`
+- Runs `cargo build --release --target x86_64-unknown-linux-musl`
 
 
 In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`, put the executable, `bootstrap`, in `target/cdk/release`, and CDK uses that as its asset. With custom runtimes, AWS Lambda looks for an executable called `bootstrap`, so this is why we need the renaming step.
@@ -195,8 +195,6 @@ $ aws iam delete-role --role-name sls-rust-test-execution
 
 ## 👩‍💻 Development using LocalStack
 
-🚧 Work in progresss 🚧
-
 LocalStack allows us to deploy our CDK services directly to our local environment:
 
 - `npm run cdklocal:start` to start the LocalStack services.
@@ -205,27 +203,28 @@ LocalStack allows us to deploy our CDK services directly to our local environmen
 
 We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
 
-Currently it seems `npm run cdklocal:deploy` doesn't create the actual Lambda, so a way to set it up at the moment is,
-
-```bash
-$ aws --endpoint-url=http://localhost:4566 lambda create-function \
-  --function-name sls-rust-minimal \
-  --handler doesnt.matter \
-  --cli-binary-format raw-in-base64-out \
-  --code S3Bucket="__local__",S3Key="$(pwd)/target/cdk/release" \
-  --runtime provided.al2 \
-  --role arn:aws:iam::000000000000:role/sls-rust-test-execution \
-  --environment Variables={RUST_BACKTRACE=1} \
-  --tracing-config Mode=Active
-```
-
 This mounts the `./target/cdk/release` directory. Whenever we update the `bootstrap` executable in here (still targeting `x86_64-unknown-linux-musl`) , it will be reflected in the Lambda function.
 
-We can then invoke it from our applications or via,
+🚧 **Unfortunately, we currently need one manual step after the first deployment:** 🚧
+
+```bash
+$ npm run cdklocal:deploy
+$ aws --endpoint-url=http://localhost:4566 lambda update-function-code \
+  --cli-binary-format raw-in-base64-out \
+  --function-name sls-rust-minimal-main \
+  --s3-bucket "__local__" \
+  --s3-key "$(pwd)/target/cdk/release"
+```
+
+We effectively run the deployment as normal, and then update the Lambda to correctly mount the `./target/cdk/release` folder.
+
+ 🚧 Related to [localstack#3086](https://github.com/localstack/localstack/issues/3086) 🚧
+
+We can then invoke it from our applications or via the AWS CLI,
 
 ```bash
 $ aws --endpoint-url=http://localhost:4566 lambda invoke \
-  --function-name sls-rust-minimal \
+  --function-name sls-rust-minimal-main \
   --cli-binary-format raw-in-base64-out \
   --payload '{"firstName": "world"}' \
   tmp-output.json > /dev/null && cat tmp-output.json && rm tmp-output.json
