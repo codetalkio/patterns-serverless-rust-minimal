@@ -255,10 +255,10 @@ Check out [the response-times table](./benchmark/response-times.md) for a the ou
 ## 📚 Libraries
 We are using a couple of libraries, in various state of maturity/release:
 
-- The master branch of [aws-lambda-rust-runtime](https://github.com/awslabs/aws-lambda-rust-runtime) pending on [#216](https://github.com/awslabs/aws-lambda-rust-runtime/issues/216) ([README from PR](https://github.com/awslabs/aws-lambda-rust-runtime/blob/5d50e1ca29b20fccaf85074a6904fa4b6ece4f05/README.md)) to be finalised for official async/await support.
+- The netlify fork of [aws-lambda-rust-runtime](https://github.com/netlify/aws-lambda-rust-runtime) pending on [#274](https://github.com/awslabs/aws-lambda-rust-runtime/issues/274).
   - We will need the musl tools, which we use instead of glibc, via `apt-get install musl-tools` for Ubuntu or `brew tap SergioBenitez/osxct && brew install FiloSottile/musl-cross/musl-cross` for macOS.
 - [aws-cdk](https://docs.aws.amazon.com/cdk/latest/guide/home.html) for deploying to AWS, using CloudFormation under-the-hood. We'll use their support for [Custom Runtimes](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-lambda-readme.html).
-- The [aws-cdk fork](https://github.com/localstack/aws-cdk) of [localstack](https://github.com/localstack/localstack) for a local development setup.
+- The [aws-cdk-local](https://github.com/localstack/aws-cdk-local) tool from [localstack](https://github.com/localstack/localstack) for a local development setup.
 - [cargo watch](https://github.com/passcod/cargo-watch) so we can develop using `cargo watch`, installable via `cargo install cargo-watch`.
 
 ## 🙋‍♀️ Contributing
