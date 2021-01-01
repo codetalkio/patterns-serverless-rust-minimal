@@ -104,9 +104,11 @@ jobs:
   localstack:
     runs-on: ubuntu-latest
     needs: [assets]
+    environment:
+      name: local
     services:
       localstack:
-        image: localstack/localstack:latest
+        image: localstack/localstack:0.12.4
         env:
           SERVICES: serverless,cloudformation,iam,sts,sqs,ssm,s3,cloudwatch,cloudwatch-logs,lambda,dynamodb,apigateway
           DEFAULT_REGION: eu-west-1
