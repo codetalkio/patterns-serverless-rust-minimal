@@ -10,10 +10,8 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 - 👩‍💻 Local development using [LocalStack](https://github.com/localstack/localstack).
 - 🚀 Deployments via [GitHub Releases](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-releases).
 
-<img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
 
-
-## ⚡️ Quick start
+**⚡️ Quick start ⚡️**
 
 Assuming you have set up npm and cargo/rustup, the following will get you going:
 
@@ -24,9 +22,12 @@ Assuming you have set up npm and cargo/rustup, the following will get you going:
 
 Other than that, just use your regular Rust development setup.
 
+Use this repo as a template to get quickly started!
+
+<img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
+
 ### Overview
 
-- [Quick start](#️-quick-start)
 - [Building](#-building)
 - [Deployment using CDK](#-deployment-using-cdk)
 - [Development using LocalStack](#-development-using-localstack)
