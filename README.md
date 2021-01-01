@@ -6,8 +6,8 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 **✨ Features ✨**
 
 - 🦀 Ready-to-use serverless setup using Rust and [AWS CDK](https://github.com/aws/aws-cdk).
-- 🚗 CI using [GitHub Actions](https://github.com/features/actions).
-- 👩‍💻 Testing of deployment in CI using [LocalStack](https://github.com/localstack/localstack). (🚧 Work in progresss 🚧)
+- 🚗 CI using [GitHub Actions](https://github.com/features/actions) testing the deployment using [LocalStack](https://github.com/localstack/localstack).
+- 👩‍💻 Local development using [LocalStack](https://github.com/localstack/localstack).
 - 🚀 Deployments via [GitHub Releases](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-releases).
 
 <img width="784" alt="Screenshot 2020-10-06 at 22 56 27" src="https://user-images.githubusercontent.com/1189998/95259406-6bc8ca80-0827-11eb-9132-0c6494921fe7.png">
@@ -18,7 +18,6 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 - [Quick start](#️-quick-start)
 - [Building](#-building)
 - [Deployment using CDK](#-deployment-using-cdk)
-- [Deployment using AWS CLI](#-deployment-using-aws-cli)
 - [Development using LocalStack](#-development-using-localstack)
 - [GitHub Actions (CI/CD)](#--github-actions-cicd)
 - [Benchmarks using AWS XRay](#️️-benchmarks-using-aws-xray)
@@ -26,6 +25,8 @@ If you are interested in a more fully-featured version of this, check out [🚧 
 - [Contributing](#️-contributing)
 
 ## ⚡️ Quick start
+
+Assuming you have set up npm and cargo/rustup, the following will get you going:
 
 - `npm ci`: install all our deployment dependencies.
 - `npm run build`: build the Rust executable and package it as an asset for CDK.
@@ -46,7 +47,6 @@ Other than that, just use your regular Rust development setup, and the commands 
 | `cdklocal:bootstrap` | Bootstrap necessary resources for CDK against LocalStack | 👩‍💻 |
 | `cdklocal:deploy` | Deploy this stack to LocalStack | 👩‍💻 |
 
-
 ## 📦 Building
 We build our executable by running `npm run build`.
 
@@ -59,13 +59,12 @@ Behind the scenes, the `build` NPM script does the following:
 In other words, we cross-compile a static binary for `x86_64-unknown-linux-musl`, put the executable, `bootstrap`, in `target/cdk/release`, and CDK uses that as its asset. With custom runtimes, AWS Lambda looks for an executable called `bootstrap`, so this is why we need the renaming step.
 
 ## 🚢 Deployment using CDK
-We build and deploy by running `npm run deploy`, or just `npm run cdk:deploy` if you have already run `npm run build` previouslt.
+We build and deploy by running `npm run deploy`, or just `npm run cdk:deploy` if you have already run `npm run build` previously.
 
 A couple of notes:
 
 - If this is the first CDK deployment ever on your AWS account/region, run `npm run cdk:bootstrap` first. This creates the necessary CDK stack resources on the cloud.
 - The CDK deployment bundles the `target/cdk/release` folder as its assets. This is where the `bootstrap` file needs to be located (handled by `npm run build`).
-
 
 **Generate our build assets**
 
@@ -113,8 +112,9 @@ And finally, if you want to see a diff between your deployed stack and your loca
 $ npm run cdk:diff
 ```
 
+<details>
+<summary> 👈 Expand here for deployment using AWS CLI</summary>
 
-## 🚢 Deployment using AWS CLI
 For real-usage we will deploy using AWS CDK, but you can dip your feet by deploying the Rust function via the AWS CLI.
 
 We'll do a couple of steps additional steps for the first time setup. Only step 5. is necessary after having done this once:
@@ -193,19 +193,25 @@ $ aws iam detach-role-policy --role-name sls-rust-test-execution --policy-arn ar
 $ aws iam delete-role --role-name sls-rust-test-execution
 ```
 
+</details>
+
+
 ## 👩‍💻 Development using LocalStack
 
 LocalStack allows us to deploy our CDK services directly to our local environment:
 
-- `npm run cdklocal:start` to start the LocalStack services.
-- `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
-- `npm run cdklocal:deploy` to deploy our stack.
+1. `npm run cdklocal:start` to start the LocalStack services.
+2. `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
+3. `npm run cdklocal:deploy` to deploy our stack.
+4. Target the local services from our application, with `cdklocal`, or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
 
-We can now target the local services with `cdklocal` or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
+We can use [cargo watch](https://crates.io/crates/cargo-watch) (via `cargo install cargo-watch`) to continously build a debug build of our application,
 
-This mounts the `./target/cdk/release` directory. Whenever we update the `bootstrap` executable in here (still targeting `x86_64-unknown-linux-musl`) , it will be reflected in the Lambda function.
+```bash
+$ cargo watch -s 'npm run build:debug'
+```
 
-We can then invoke it from our applications or via the AWS CLI,
+If you want to test the application through the AWS CLI, the following should do the trick,
 
 ```bash
 $ aws --endpoint-url=http://localhost:4566 lambda invoke \
@@ -215,6 +221,12 @@ $ aws --endpoint-url=http://localhost:4566 lambda invoke \
   tmp-output.json > /dev/null && cat tmp-output.json && rm tmp-output.json
 {"message":"Hello, world!"}
 ```
+
+#### How does this work?
+
+LocalStack supports [using local code for lambdas](https://github.com/localstack/localstack#using-local-code-with-lambda), which is what we take advantage of here. This works because step 3. mounts the `./target/cdk/release` directory. Whenever we update the `bootstrap` executable in here (still targeting `x86_64-unknown-linux-musl`) , it will be reflected in the Lambda function.
+
+You can see this in the `./deployment/lib/lambda-stack.ts` file where we conditionally switch out how we bundle the Lambda code based on the presence of a `CDK_LOCAL` environment variable.
 
 ## 🚗 🚀 GitHub Actions (CI/CD)
 Using [GitHub actions](/actions) allows us to have an efficient CI/CD setup with minimal work.
