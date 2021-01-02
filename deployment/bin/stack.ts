@@ -3,7 +3,9 @@ import * as cdk from "@aws-cdk/core";
 import { LambdaStack } from "../lib/lambda-stack";
 import * as pkg from "../../package.json";
 
-const STACK_NAME = pkg.name;
+// Allow appending a randomized benchmark number.
+const { BENCHMARK_SUFFIX } = process.env;
+const STACK_NAME = BENCHMARK_SUFFIX ? `${pkg.name}-${BENCHMARK_SUFFIX}` : pkg.name;
 
 /**
  * Construct for the Serverless Rust Application.
