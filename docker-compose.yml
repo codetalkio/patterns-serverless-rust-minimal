@@ -3,7 +3,8 @@ version: "2.1"
 services:
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
-    image: localstack/localstack:0.12.4
+    # image: localstack/localstack:0.12.4
+    image: localstack/localstack:latest
     network_mode: bridge
     ports:
       - "4566:4566"
