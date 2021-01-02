@@ -44,6 +44,7 @@ jobs:
         uses: ./.github/actions/build-asset
 
       - name: Benchmark
+        id: benchmark
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
@@ -51,9 +52,25 @@ jobs:
           AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
           CI: "true"
         run: |
+          export BENCHMARK_SUFFIX=$RANDOM
+          echo "::set-output name=BENCHMARK_SUFFIX::$BENCHMARK_SUFFIX"
           npm run benchmark
 
+      # Make sure we always clean up even after failing.
+      - name: Ensure clean up
+        if: failure()
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
+          CI: "true"
+          BENCHMARK_SUFFIX: ${{ steps.benchmark.outputs.BENCHMARK_SUFFIX }}
+        run: |
+          npm run benchmark:destroy
+
+      # Only commit the results upon success.
       - name: Commit benchmark results
+        if: success()
         uses: codetalkio/add-and-commit@v6
         with:
           author_name: GitHub Actions

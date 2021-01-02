@@ -16,7 +16,7 @@
     "build:debug": "cargo build --target x86_64-unknown-linux-musl && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/debug/bootstrap ./target/cdk/release/bootstrap",
     "build:archive": "(cd ./target/cdk/release/ && zip ./lambda.zip ./bootstrap) && mv ./target/cdk/release/lambda.zip ./lambda.zip",
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
-    "benchmark": "export BENCHMARK_SUFFIX=$RANDOM; npm run benchmark:setup && ts-node -- ./benchmark/benchmark.ts && npm run benchmark:destroy",
+    "benchmark": "export BENCHMARK_SUFFIX=${BENCHMARK_SUFFIX-$RANDOM}; npm run benchmark:setup && ts-node -- ./benchmark/benchmark.ts && npm run benchmark:destroy",
     "benchmark:setup": "[[ $DRY_RUN != 'true' ]] && CI=true npm run deploy || echo 'Dry run, skipping deploy.'",
     "benchmark:destroy": "[[ $BENCHMARK_SUFFIX != '' && $DRY_RUN != 'true' ]] &&  cdk destroy --force '*' || echo 'Dry run, skipping teardown.'",
     "cdk:synth": "cdk synth",
