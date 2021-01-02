@@ -7,7 +7,7 @@ on:
       - prereleased
 
 jobs:
-  deploy:
+  benchmark:
     runs-on: ubuntu-latest
     environment:
       name: benchmark

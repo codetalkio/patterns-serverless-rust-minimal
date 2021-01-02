@@ -9,6 +9,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: "deploy pre-release"
     environment:
       name: staging
 
