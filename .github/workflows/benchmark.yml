@@ -10,8 +10,8 @@ on: push
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    environment:
-      name: benchmark
+    # environment:
+    #   name: benchmark
 
     steps:
       - uses: actions/checkout@v2
