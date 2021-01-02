@@ -31,13 +31,20 @@ jobs:
           key: node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             node-
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: "Setup node dependencies"
         uses: ./.github/actions/setup-node-deps
       - name: "Build asset"
         uses: ./.github/actions/build-asset
 
       - name: Deploy
-        if: env.PRE_RELEASE_AWS_ACCESS_KEY_ID && env.PRE_RELEASE_AWS_SECRET_ACCESS_KEY
+        if: secrets.PRE_RELEASE_AWS_ACCESS_KEY_ID && secrets.PRE_RELEASE_AWS_SECRET_ACCESS_KEY
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PRE_RELEASE_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PRE_RELEASE_AWS_SECRET_ACCESS_KEY }}
