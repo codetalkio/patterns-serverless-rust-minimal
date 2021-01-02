@@ -15,11 +15,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Validate release tag
-        run: |
-          # We only want to run on tags looking like refs/tags/v1200.
-          echo "Checking tag: $GITHUB_REF"
-          [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
+      # - name: Validate release tag
+      #   run: |
+      #     # We only want to run on tags looking like refs/tags/v1200.
+      #     echo "Checking tag: $GITHUB_REF"
+      #     [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
       - name: Setup Node.js 14.12.0
         uses: actions/setup-node@v1
