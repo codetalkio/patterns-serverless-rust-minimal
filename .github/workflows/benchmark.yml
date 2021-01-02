@@ -45,11 +45,11 @@ jobs:
       #   uses: ./.github/actions/build-asset
 
       - name: Benchmark
-        if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
+        # if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
+        # env:
+        #   AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
+        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
+        #   AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
           CI: "true"
         run: |
           export BENCHMARK_SUFFIX=$$RANDOM
