@@ -47,6 +47,7 @@ interface OverallTime {
 }
 
 interface TraceTime {
+  id: string | undefined;
   totalTime: number | undefined;
   initTime: number | undefined;
   invocTime: number | undefined;
@@ -115,7 +116,16 @@ const processXRayTraces = (traces: Trace[]): ProcessedTimes => {
 
     const isColdStart = initTime ? true : false;
 
+    // Validate that the trace.
+    const otherTime = (initTime || 0) + (invocTime || 0) + (overheadTime || 0);
+    if (totalTime! < otherTime) {
+      console.error(
+        `[TRACES] Invalid trace with total time '${totalTime}' less than sum of other times '${otherTime}'. ID = ${trace.Id}.`
+      );
+      return;
+    }
     traceTimes.push({
+      id: trace.Id,
       totalTime,
       initTime,
       invocTime,
@@ -171,7 +181,7 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
 |---------------|----------------|------------|----------|------------------|-------------|`;
     times.traceTimes.map((time) => {
       const isColdStart = !!time.initTime;
-      const totalTimeMs = `${Math.floor(time.totalTime! * 10000) / 10} ms`;
+      const totalTimeMs = time.totalTime ? `${Math.floor(time.totalTime * 10000) / 10} ms` : "";
       const initTimeMs = time.initTime ? `${Math.floor(time.initTime * 10000) / 10} ms` : "";
       const invocTimeMs = time.invocTime ? `${Math.floor(time.invocTime * 10000) / 10} ms` : "";
       const overheadTimeMs = time.overheadTime ? `${Math.floor(time.overheadTime * 10000) / 10} ms` : "";
