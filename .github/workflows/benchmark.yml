@@ -1,11 +1,10 @@
 name: benchmark
 
 # Refer to https://help.github.com/en/articles/workflow-syntax-for-github-actions for documentation on Actions.
-# on:
-#   release:
-#     types:
-#       - prereleased
-on: push
+on:
+  release:
+    types:
+      - prereleased
 
 jobs:
   benchmark:
@@ -15,11 +14,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      # - name: Validate release tag
-      #   run: |
-      #     # We only want to run on tags looking like refs/tags/v1200.
-      #     echo "Checking tag: $GITHUB_REF"
-      #     [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
+      - name: Validate release tag
+        run: |
+          # We only want to run on tags looking like refs/tags/v1200.
+          echo "Checking tag: $GITHUB_REF"
+          [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
 
       - name: Setup Node.js 14.12.0
         uses: actions/setup-node@v1
@@ -48,21 +47,23 @@ jobs:
         id: benchmark
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
         env:
-          CI: "true"
           AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
+          CI: "true"
         run: |
           export BENCHMARK_SUFFIX=$RANDOM
           echo "::set-output name=BENCHMARK_SUFFIX::$BENCHMARK_SUFFIX"
-          npm run benchmark:setup
-          # npm run benchmark
-          exit 1
+          npm run benchmark
 
       # Make sure we always clean up even after failing.
       - name: Ensure clean up
         if: failure()
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
+          CI: "true"
           BENCHMARK_SUFFIX: ${{ steps.benchmark.outputs.BENCHMARK_SUFFIX }}
         run: |
           npm run benchmark:destroy
