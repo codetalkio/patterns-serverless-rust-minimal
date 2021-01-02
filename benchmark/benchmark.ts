@@ -25,8 +25,8 @@ const chartistSvg = require("svg-chartist");
 /**
  * Benchmark configuration values.
  */
-const COLD_STARTS = 100;
-const WARM_STARTS = 100;
+const COLD_STARTS = 50;
+const WARM_STARTS = 50;
 const MEMORY_SIZES = [128, 256, 512, 1024, 2048, 3072, 4096];
 
 /**
