@@ -10,8 +10,8 @@ on: push
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    # environment:
-    #   name: benchmark
+    environment:
+      name: benchmark
 
     steps:
       - uses: actions/checkout@v2
@@ -39,46 +39,41 @@ jobs:
             ~/.cargo/git
             target
           key: cargo-${{ hashFiles('**/Cargo.lock') }}
-      # - name: "Setup node dependencies"
-      #   uses: ./.github/actions/setup-node-deps
-      # - name: "Build asset"
-      #   uses: ./.github/actions/build-asset
+      - name: "Setup node dependencies"
+        uses: ./.github/actions/setup-node-deps
+      - name: "Build asset"
+        uses: ./.github/actions/build-asset
 
       - name: Benchmark
         id: benchmark
-        # if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
+        if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
         env:
           CI: "true"
-        #   AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
-        #   AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
-        #   AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
         run: |
           export BENCHMARK_SUFFIX=$RANDOM
-          echo $BENCHMARK_SUFFIX
-          echo "::set-output name=BENCHMARK_SUFFIX::$BENCHMARK_SUFFIX\n"
+          echo "::set-output name=BENCHMARK_SUFFIX::$BENCHMARK_SUFFIX"
+          npm run benchmark:setup
           # npm run benchmark
+          exit 1
 
-      - name: Benchmark
-        if: success()
-        env:
-          BENCHMARK_SUFFIX: ${{ steps.benchmark.outputs.BENCHMARK_SUFFIX }}
-        run: |
-          echo "Yay"
-          echo "$BENCHMARK_SUFFIX"
-
-      - name: Benchmark
+      # Make sure we always clean up even after failing.
+      - name: Ensure clean up
         if: failure()
         env:
           BENCHMARK_SUFFIX: ${{ steps.benchmark.outputs.BENCHMARK_SUFFIX }}
         run: |
-          echo "Nope"
-          echo "$BENCHMARK_SUFFIX"
+          npm run benchmark:destroy
 
-      # - name: Commit benchmark results
-      #   uses: codetalkio/add-and-commit@v6
-      #   with:
-      #     author_name: GitHub Actions
-      #     author_email: no-reply@codetalk.io
-      #     message: "Bot: Updating benchmark results"
-      #     add: "./benchmark/*"
-      #     branch: master
+      # Only commit the results upon success.
+      - name: Commit benchmark results
+        if: success()
+        uses: codetalkio/add-and-commit@v6
+        with:
+          author_name: GitHub Actions
+          author_email: no-reply@codetalk.io
+          message: "Bot: Updating benchmark results"
+          add: "./benchmark/*"
+          branch: master
