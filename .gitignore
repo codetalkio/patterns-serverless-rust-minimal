@@ -10,3 +10,4 @@ lambda.zip
 cdk.out
 
 node_modules
+benchmark/traces.json

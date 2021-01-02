@@ -21,23 +21,30 @@ import * as pkg from "../package.json";
 
 const chartistSvg = require("svg-chartist");
 
-const COLD_STARTS = 50;
+// Configuration of the benchmark.
+const COLD_STARTS = 2;
 const WARM_STARTS = 3;
+const MEMORY_SIZES = [128, 256, 512, 1024, 2048, 3072, 4096];
 
 const { BENCHMARK_SUFFIX, DRY_RUN } = process.env;
 const STACK_NAME = BENCHMARK_SUFFIX ? `${pkg.name}-${BENCHMARK_SUFFIX}` : pkg.name;
 
 interface MemoryTimes {
   memorySize: number;
-  times: ProcessedTimes;
+  times: BenchmarkResults;
 }
 
-interface ProcessedTimes {
-  overallTimes: OverallTime;
-  traceTimes: TraceTime[];
+interface MemoryTraces {
+  memorySize: number;
+  traces: MinimalTrace[];
 }
 
-interface OverallTime {
+interface BenchmarkResults {
+  overallTimes: BenchmarkAggregateMetrics;
+  traceTimes: BenchmarkSingleInvocationMetric[];
+}
+
+interface BenchmarkAggregateMetrics {
   avgWarmMs: number | undefined;
   avgColdMs: number | undefined;
   fastestWarmMs: number | undefined;
@@ -46,12 +53,27 @@ interface OverallTime {
   slowestColdMs: number | undefined;
 }
 
-interface TraceTime {
+interface BenchmarkSingleInvocationMetric {
   id: string | undefined;
   totalTime: number | undefined;
   initTime: number | undefined;
   invocTime: number | undefined;
   overheadTime: number | undefined;
+}
+
+type MinimalTrace = Pick<Trace, "Id"> & { Segments: SegmentDocument[] };
+
+interface SegmentDocument {
+  origin?: string;
+  end_time: number;
+  start_time: number;
+  subsegments?: SubSegment[];
+}
+
+interface SubSegment {
+  name?: string;
+  end_time: number;
+  start_time: number;
 }
 
 /**
@@ -75,10 +97,10 @@ const chunkArray = (arr: any[], size: number) => {
 };
 
 /**
- * Process a list of XRay detailed traces, extracting the times for the various
+ * Process a list of XRay detailed traces, extracting the timings for the various
  * segments, along with overall metrics.
  */
-const processXRayTraces = (traces: Trace[]): ProcessedTimes => {
+const processXRayTraces = (traces: MinimalTrace[]): BenchmarkResults => {
   console.log("[TRACES] Processing trace information.");
   // Gather overall metrics.
   let avgWarmMs: number | undefined;
@@ -89,7 +111,7 @@ const processXRayTraces = (traces: Trace[]): ProcessedTimes => {
   let slowestColdMs: number | undefined;
 
   // Gather per-trace metrics.
-  const traceTimes: TraceTime[] = [];
+  const traceTimes: BenchmarkSingleInvocationMetric[] = [];
   traces.map((trace) => {
     let totalTime: number | undefined;
     let initTime: number | undefined;
@@ -97,12 +119,11 @@ const processXRayTraces = (traces: Trace[]): ProcessedTimes => {
     let overheadTime: number | undefined;
 
     // Piece together the segment timings into one measurement.
-    trace.Segments?.filter((s) => s.Document !== undefined).map((segment) => {
-      const seg = JSON.parse(segment.Document!);
+    trace.Segments?.map((seg) => {
       if (seg.origin === "AWS::Lambda") {
         totalTime = seg.end_time - seg.start_time;
       } else if (seg.origin === "AWS::Lambda::Function") {
-        seg.subsegments?.map((subSeg: any) => {
+        seg.subsegments?.map((subSeg) => {
           if (subSeg.name === "Initialization") {
             initTime = subSeg.end_time - subSeg.start_time;
           } else if (subSeg.name === "Invocation") {
@@ -132,12 +153,12 @@ const processXRayTraces = (traces: Trace[]): ProcessedTimes => {
       overheadTime,
     });
 
+    // Keep track of overall metrics.
     if (!isColdStart) {
       avgWarmMs = !avgWarmMs ? totalTime : (avgWarmMs + totalTime!) / 2;
       fastestWarmMs = !fastestWarmMs || totalTime! < fastestWarmMs ? totalTime : fastestWarmMs;
       slowestWarmMs = !slowestWarmMs || totalTime! > slowestWarmMs ? totalTime : slowestWarmMs;
-    }
-    if (isColdStart) {
+    } else if (isColdStart) {
       avgColdMs = !avgColdMs ? totalTime : (avgColdMs + totalTime!) / 2;
       fastestColdMs = !fastestColdMs || totalTime! < fastestColdMs ? totalTime : fastestColdMs;
       slowestColdMs = !slowestColdMs || totalTime! > slowestColdMs ? totalTime : slowestColdMs;
@@ -157,15 +178,19 @@ const processXRayTraces = (traces: Trace[]): ProcessedTimes => {
   };
 };
 
+/**
+ * Output the results to the `response-times.md` markdown file by manually piecing together the
+ * markdown content.
+ */
 const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
   console.log("[OUTPUT] Saving benchmark times to 'response-times.md'.");
 
-  let mdOutput = "";
+  let benchmarkData = "";
   memoryTimes.map(({ memorySize, times }) => {
-    mdOutput += `
+    benchmarkData += `
 
 ## Results for ${memorySize} MB`;
-    mdOutput += `
+    benchmarkData += `
 
 | Measurement (${memorySize} MB) | Time (ms) |
 |-------------|------|
@@ -177,7 +202,7 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
 | Slowest cold response time | ${Math.floor(times.overallTimes.slowestColdMs! * 10000) / 10} ms |
   `;
 
-    mdOutput += `
+    benchmarkData += `
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|`;
@@ -188,16 +213,11 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
       const invocTimeMs = time.invocTime ? `${Math.floor(time.invocTime * 10000) / 10} ms` : "";
       const overheadTimeMs = time.overheadTime ? `${Math.floor(time.overheadTime * 10000) / 10} ms` : "";
       const coldOrWarmStart = isColdStart ? "🥶" : "🥵";
-      mdOutput += `
+      benchmarkData += `
 | ${totalTimeMs} | ${initTimeMs} | ${invocTimeMs} | ${overheadTimeMs} | ${coldOrWarmStart} | ${memorySize} MB |`;
     });
   });
 
-  let tableOfContents = "";
-  memoryTimes.map(({ memorySize }) => {
-    tableOfContents += `
-- [Results for ${memorySize} MB](#results-for-${memorySize}-mb)`;
-  });
   const header = `
 # Benchmark: Response Times
 
@@ -215,12 +235,17 @@ The following are the response time results from AWS XRay, generated after runni
 - 🟡: Fastest cold response time
 - 🟠: Slowest cold response time
 
+`;
 
+  let tableOfContents = `
 ## Overview
 
-${tableOfContents}
+  `;
+  memoryTimes.map(({ memorySize }) => {
+    tableOfContents += `
+- [Results for ${memorySize} MB](#results-for-${memorySize}-mb)`;
+  });
 
-`;
   const footer = `
 
 ## XRay Example of a Cold Start
@@ -231,10 +256,16 @@ ${tableOfContents}
 
 <img width="1479" alt="Screenshot 2020-10-07 at 23 01 23" src="https://user-images.githubusercontent.com/1189998/95387509-1953e080-08f1-11eb-8d46-ac25efa235e4.png">
 `;
-  mdOutput = header + mdOutput + footer;
-  fs.writeFileSync("./benchmark/response-times.md", mdOutput);
+  const markdown = [header, tableOfContents, benchmarkData, footer].join("\n");
+  fs.writeFileSync("./benchmark/response-times.md", markdown);
 };
 
+/**
+ * Output two charts based on the data, showing the behaviour and performance of the AWS Lambda:
+ * - response-times-average.svg: Shows average cold start and warm starts, for each memory configuration.
+ * - response-times-extremes.svg: Shows the fastest and slowests response times for both cold and warm
+ *   starts, for each memory configuration.
+ */
 const outputBenchmarkChart = async (memoryTimes: MemoryTimes[]) => {
   console.log("[OUTPUT] Charting benchmark times to 'response-times.svg'.");
 
@@ -275,8 +306,10 @@ const outputBenchmarkChart = async (memoryTimes: MemoryTimes[]) => {
   ];
   memoryTimes.map(({ memorySize, times }) => {
     labels.push(`${memorySize}MB`);
+    // Add the average data to the first chart series.
     avgSeries[0].push(Math.floor(times.overallTimes.avgColdMs! * 10000) / 10);
     avgSeries[1].push(Math.floor(times.overallTimes.avgWarmMs! * 10000) / 10);
+    // Add the extremes data to the second chart series.
     extremesSeries[0].push(Math.floor(times.overallTimes.fastestWarmMs! * 10000) / 10);
     extremesSeries[1].push(Math.floor(times.overallTimes.slowestWarmMs! * 10000) / 10);
     extremesSeries[2].push(Math.floor(times.overallTimes.fastestColdMs! * 10000) / 10);
@@ -302,6 +335,13 @@ const outputBenchmarkChart = async (memoryTimes: MemoryTimes[]) => {
   });
 };
 
+/**
+ * Run the actual benchmark, performing a series of invocations to the Lambda. To ensure cold
+ * starts, we trigger an update on the functions environment variables before invoking it. We
+ * then invoke it a number of times afterwards to gather warm startup data as well.
+ *
+ * The `memorySize` configuration sets the Lambda memory size, allowing easy scale up and down.
+ */
 const invokeFunctions = async (functionName: string, memorySize: number) => {
   const lambdaClient = new LambdaClient({});
   const baseConfiguration = await lambdaClient.send(
@@ -340,6 +380,14 @@ const invokeFunctions = async (functionName: string, memorySize: number) => {
   }
 };
 
+/**
+ * Fetch all XRay trace summaries, which contain the trace IDs we will need to get the detailed information. We
+ * limit the information we search for by filtering on the `functionName` and on service type of AWS:Lambda. Additionally,
+ * we only look in the period between the `benchmarkStartTime` time and the time that this function is called.
+ *
+ * Since XRay trace can take some time to appear, we also gracefully handle waiting if we don't see at least 90% of
+ * the traces in the results.
+ */
 const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime: Date): Promise<TraceSummary[]> => {
   const benchmarkEndTime = new Date();
   const xRayClient = new XRayClient({});
@@ -366,9 +414,10 @@ const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime:
     // XRay is sampling our requests.
     if ((traceSummariesRes.TraceSummaries?.length ?? 0) + traceSummaries.length < COLD_STARTS * WARM_STARTS * 0.9) {
       if (retries >= 20) {
-        throw new Error(
+        console.error(
           `[TEARDOWN] Failed to get all traces for the invocations, was only able to find '${traceSummariesRes.TraceSummaries?.length}' traces.`
         );
+        process.exit(0);
       }
       console.log("[TRACES] Traces has still not appeared, waiting 1 seconds and trying again...");
       await sleep(1000);
@@ -385,10 +434,19 @@ const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime:
   return traceSummaries;
 };
 
-const fetchXRayTraceBatches = async (traceSummaries: TraceSummary[]): Promise<Trace[]> => {
+/**
+ * Once we have a list of trace IDs, we can get the detailed trace information which contain the breakdown
+ * of the different stages the Lambda function went through.
+ *
+ * Because the XRay API is limited to fetching 5 traces at a time, we divide all the trace IDs into chunks of
+ * 5. Additionally, we re-request traces if we detect any that are unprocessed.
+ *
+ * NOTE: To avoid leaking information, all traces are stripped of information and only a whitelist is saved.
+ */
+const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[]): Promise<MinimalTrace[]> => {
   const xRayClient = new XRayClient({});
+  const batchTraces: MinimalTrace[] = [];
 
-  const batchTraces: Trace[] = [];
   // We can only request 5 traces at a time, so we split the summary IDs into chunks.
   const batchSummaryChunks = chunkArray(traceSummaries, 5);
 
@@ -401,16 +459,37 @@ const fetchXRayTraceBatches = async (traceSummaries: TraceSummary[]): Promise<Tr
         NextToken: nextTokenBatch,
       };
       const batchTracesRes = await xRayClient.send(new BatchGetTracesCommand(batchInput));
-      // Check if there are any unprocessed traces.
+
+      // Check if there are any unprocessed traces. If there are, we wait 1 second and retry the loop.
       if ((batchTracesRes.UnprocessedTraceIds?.length ?? 0) > 0) {
         console.log("[TRACES] Detailed traces are still being processed, waiting 1 second and trying again...");
         await sleep(1000);
         continue;
       }
 
-      nextTokenBatch = batchTracesRes.NextToken;
-      batchTraces.push(...(batchTracesRes.Traces ?? []));
+      // Only store the relevant parts of the traces, so we can't accidentally leak information.
+      const minimalTraces: MinimalTrace[] = (batchTracesRes.Traces ?? []).map((t) => ({
+        Id: t.Id,
+        Segments: (t.Segments ?? [])
+          .filter((s) => s.Document !== undefined)
+          .map((s: any) => {
+            const seg: SegmentDocument = JSON.parse(s.Document!);
+            const cleanedSeg: SegmentDocument = {
+              origin: seg.origin,
+              end_time: seg.end_time,
+              start_time: seg.start_time,
+              subsegments: seg.subsegments?.map((subSeg) => ({
+                name: subSeg.name,
+                end_time: subSeg.end_time,
+                start_time: subSeg.start_time,
+              })),
+            };
+            return cleanedSeg;
+          }),
+      }));
+      batchTraces.push(...minimalTraces);
 
+      nextTokenBatch = batchTracesRes.NextToken;
       if (nextTokenBatch === undefined) {
         break;
       }
@@ -420,6 +499,20 @@ const fetchXRayTraceBatches = async (traceSummaries: TraceSummary[]): Promise<Tr
   return batchTraces;
 };
 
+/**
+ * Run the benchmark by:
+ * - Iterating through memory configurations.
+ * - Updating the Lambda with each memory configuration.
+ * - Invoking the Lambda for n cold starts and m warm starts.
+ * - Extract all XRay traces.
+ * - Process the traces to get the benchmark results.
+ * - Output a markdown table and two charts.
+ *
+ * If you just want to reprocess the results, run the benchmark with `DRY_RUN`,
+ * e.g. `DRY_RUN=true npm run benchmark`. This will skip deployment, teardown, invocations, and
+ * fetching of XRay traces, and instead load the existing traces from `traces.json` and generate
+ * the output again.
+ */
 (async () => {
   const functionName = `${STACK_NAME}-main`;
   console.log(`[SETUP] BENCHMARK_SUFFIX = ${BENCHMARK_SUFFIX}`);
@@ -429,33 +522,40 @@ const fetchXRayTraceBatches = async (traceSummaries: TraceSummary[]): Promise<Tr
     process.exit(1);
   }
 
-  if (DRY_RUN === "true") {
-    const times = fs.readFileSync("./benchmark/traces.json").toString();
-    outputBenchmarkMarkdown(JSON.parse(times));
-    outputBenchmarkChart(JSON.parse(times));
-    return;
-  }
-
   const benchmarkStartTime = new Date();
-  const memorySizes = [128, 256, 512, 1024, 2048, 3072, 4096];
-  try {
-    const memoryTimes: MemoryTimes[] = [];
-    for (let i = 0; i < memorySizes.length; i++) {
-      const memorySize = memorySizes[i];
+
+  const memoryTimes: MemoryTimes[] = [];
+  if (DRY_RUN === "true") {
+    // If we are running a dry run, we only need to load in the existing traces and process them.
+    const memoryTraces = JSON.parse(fs.readFileSync("./benchmark/traces.json").toString());
+    memoryTraces.forEach(({ memorySize, traces: traceBatches }: MemoryTraces) => {
+      const times = processXRayTraces(traceBatches);
+      memoryTimes.push({
+        memorySize,
+        times,
+      });
+    });
+  } else {
+    // For each memory configuration, go through the benchmark process.
+    const memoryTraces: MemoryTraces[] = [];
+    for (let i = 0; i < MEMORY_SIZES.length; i++) {
+      const memorySize = MEMORY_SIZES[i];
       await invokeFunctions(functionName, memorySize);
       const traceSummaries = await fetchXRayTraceSummaries(functionName, benchmarkStartTime);
       const traceBatches = await fetchXRayTraceBatches(traceSummaries);
+      memoryTraces.push({
+        memorySize,
+        traces: traceBatches,
+      });
       const times = processXRayTraces(traceBatches);
       memoryTimes.push({
         memorySize,
         times,
       });
     }
-
-    fs.writeFileSync("./benchmark/traces.json", JSON.stringify(memoryTimes));
-    outputBenchmarkMarkdown(memoryTimes);
-    outputBenchmarkChart(memoryTimes);
-  } catch (err) {
-    console.error(err.message);
+    fs.writeFileSync("./benchmark/traces.json", JSON.stringify(memoryTraces));
   }
+
+  outputBenchmarkMarkdown(memoryTimes);
+  outputBenchmarkChart(memoryTimes);
 })();

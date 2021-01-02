@@ -1,16 +1,16 @@
-name: release
+name: benchmark
 
 # Refer to https://help.github.com/en/articles/workflow-syntax-for-github-actions for documentation on Actions.
 on:
   release:
     types:
-      - released
+      - prereleased
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: benchmark
 
     steps:
       - uses: actions/checkout@v2
@@ -36,12 +36,20 @@ jobs:
       - name: "Build asset"
         uses: .github/actions/build-asset
 
-      - name: Deploy
-        if: env.RELEASE_AWS_ACCESS_KEY_ID && env.RELEASE_AWS_SECRET_ACCESS_KEY
+      - name: Benchmark
+        if: env.BENCHMARK_AWS_ACCESS_KEY_ID && env.BENCHMARK_AWS_SECRET_ACCESS_KEY
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.RELEASE_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.RELEASE_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.RELEASE_AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.BENCHMARK_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
           CI: "true"
         run: |
-          npm run cdk:deploy
+          npm run benchmark
+
+      - name: Commit benchmark results
+        uses: EndBug/add-and-commit@v6
+        with:
+          author_name: GitHub Actions
+          author_email: no-reply@codetalk.io
+          message: "Bot: Updating benchmark results"
+          add: "./benchmark/*"
