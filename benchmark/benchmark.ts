@@ -134,12 +134,20 @@ const main = async (functionName: string) => {
       });
     });
   } else {
-    // For each memory configuration, go through the benchmark process.
-    const memoryTraces: MemoryTraces[] = [];
+    // For each memory configuration, run through all invocations first.
+    const benchmarkStartTimes: Date[] = [];
     for (let i = 0; i < MEMORY_SIZES.length; i++) {
       const benchmarkStartTime = new Date();
+      benchmarkStartTimes.push(benchmarkStartTime);
       const memorySize = MEMORY_SIZES[i];
       await invokeFunctions(functionName, memorySize);
+      await sleep(1000);
+    }
+    // The XRay traces should now be ready for us to fetch.
+    const memoryTraces: MemoryTraces[] = [];
+    for (let i = 0; i < MEMORY_SIZES.length; i++) {
+      const benchmarkStartTime = benchmarkStartTimes[i];
+      const memorySize = MEMORY_SIZES[i];
       const traceSummaries = await fetchXRayTraceSummaries(functionName, benchmarkStartTime);
       const traceBatches = await fetchXRayTraceBatches(traceSummaries);
       memoryTraces.push({
@@ -151,7 +159,6 @@ const main = async (functionName: string) => {
         memorySize,
         times,
       });
-      await sleep(5000);
     }
     fs.writeFileSync("./benchmark/traces.json", JSON.stringify(memoryTraces));
   }
@@ -211,14 +218,16 @@ const invokeFunctions = async (functionName: string, memorySize: number) => {
   for (let cI = 0; cI < COLD_STARTS; cI++) {
     console.log("[BENCHMARK] Updating the function to ensure a cold start.");
     await lambdaClient.send(new UpdateFunctionConfigurationCommand(updateConfiguration()));
-    console.log("[BENCHMARK] Invoke cold-start function.");
+    const s = Date.now();
     await lambdaClient.send(new InvokeCommand(testPayload()));
+    console.log(`[BENCHMARK] Invoked cold-start function: ${Date.now() - s}ms.`);
     await sleep(500);
   }
   for (let wI = 0; wI < WARM_STARTS; wI++) {
-    console.log("[BENCHMARK] Invoke warm-start function.");
-    await sleep(500);
+    const s = Date.now();
     await lambdaClient.send(new InvokeCommand(testPayload()));
+    console.log(`[BENCHMARK] Invoked warm-start function: ${Date.now() - s}ms.`);
+    await sleep(500);
   }
 };
 
@@ -233,9 +242,6 @@ const invokeFunctions = async (functionName: string, memorySize: number) => {
 const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime: Date): Promise<TraceSummary[]> => {
   const benchmarkEndTime = new Date();
   const xRayClient = new XRayClient({});
-
-  console.log("[TRACES] XRay traces take a bit of time to appear, so we wait 10 seconds before requesting.");
-  await sleep(10000);
 
   const traceSummaries: TraceSummary[] = [];
   let nextTokenSummary: string | undefined;
@@ -255,7 +261,7 @@ const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime:
     // Make sure we've fetched all our traces. We only require 90% to have been gathered, since
     // XRay is sampling our requests.
     if ((traceSummariesRes.TraceSummaries?.length ?? 0) + traceSummaries.length < (COLD_STARTS + WARM_STARTS) * 0.8) {
-      if (retries >= 20) {
+      if (retries >= 40) {
         throw new Error(
           `[TEARDOWN] Failed to get all traces for the invocations, was only able to find '${traceSummariesRes.TraceSummaries?.length}' traces.`
         );
@@ -392,9 +398,9 @@ const processXRayTraces = (traces: MinimalTrace[]): BenchmarkResults => {
 
     const isColdStart = initTime ? true : false;
 
-    // XRay can sometimes hand us back invalid traces where the total time is less than the
-    // sum of its elements. We discard these traces (see https://github.com/codetalkio/patterns-serverless-rust-minimal/issues/5#issuecomment-753418987
-    // for an example).
+    // XRay validation (see https://github.com/codetalkio/patterns-serverless-rust-minimal/issues/5 for context):
+    // 1. XRay can sometimes hand us back invalid traces where the total time is less than the
+    // sum of its elements. We discard these traces.
     const otherTime = (initTime || 0) + (invocTime || 0) + (overheadTime || 0);
     if (totalTime! < otherTime) {
       console.error(
@@ -402,6 +408,13 @@ const processXRayTraces = (traces: MinimalTrace[]): BenchmarkResults => {
       );
       return;
     }
+    // 2. Similarly, XRay sometimes only catches the Lambda service part, but not the function metrics
+    // themselves. We are then unable to tell if it was a cold start or not.
+    if (!invocTime) {
+      console.error(`[TRACES] Invalid trace with missing invocation time. ID = ${trace.Id}.`);
+      return;
+    }
+
     traceTimes.push({
       id: trace.Id,
       totalTime,
@@ -462,8 +475,8 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
 
     benchmarkData += `
 
-| Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
-|---------------|----------------|------------|----------|------------------|-------------|`;
+| Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size | Trace ID |
+|---------------|----------------|------------|----------|------------------|-------------|----------|`;
     times.traceTimes.map((time) => {
       const isColdStart = !!time.initTime;
       const totalTimeMs = time.totalTime ? `${Math.floor(time.totalTime * 10000) / 10} ms` : "";
@@ -472,7 +485,7 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
       const overheadTimeMs = time.overheadTime ? `${Math.floor(time.overheadTime * 10000) / 10} ms` : "";
       const coldOrWarmStart = isColdStart ? "🥶" : "🥵";
       benchmarkData += `
-| ${totalTimeMs} | ${initTimeMs} | ${invocTimeMs} | ${overheadTimeMs} | ${coldOrWarmStart} | ${memorySize} MB |`;
+| ${totalTimeMs} | ${initTimeMs} | ${invocTimeMs} | ${overheadTimeMs} | ${coldOrWarmStart} | ${memorySize} MB | ${time.id} |`;
     });
   });
 
