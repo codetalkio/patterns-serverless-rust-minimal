@@ -23,7 +23,7 @@ const chartistSvg = require("svg-chartist");
 
 // Configuration of the benchmark.
 const COLD_STARTS = 50;
-const WARM_STARTS = 1;
+const WARM_STARTS = 2;
 const MEMORY_SIZES = [128, 256, 512, 1024, 2048, 3072, 4096];
 
 const { BENCHMARK_SUFFIX, DRY_RUN } = process.env;
