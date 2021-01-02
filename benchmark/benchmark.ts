@@ -162,7 +162,9 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
 
   let mdOutput = "";
   memoryTimes.map(({ memorySize, times }) => {
-    mdOutput += `## Results for ${memorySize} MB`;
+    mdOutput += `
+
+## Results for ${memorySize} MB`;
     mdOutput += `
 
 | Measurement (${memorySize} MB) | Time (ms) |
@@ -191,6 +193,11 @@ const outputBenchmarkMarkdown = async (memoryTimes: MemoryTimes[]) => {
     });
   });
 
+  let tableOfContents = "";
+  memoryTimes.map(({ memorySize }) => {
+    tableOfContents += `
+- [Results for ${memorySize} MB](#results-for-${memorySize}-mb)`;
+  });
   const header = `
 # Benchmark: Response Times
 
@@ -207,6 +214,11 @@ The following are the response time results from AWS XRay, generated after runni
 - 🔴: Slowest warm response time
 - 🟡: Fastest cold response time
 - 🟠: Slowest cold response time
+
+
+## Overview
+
+${tableOfContents}
 
 `;
   const footer = `
