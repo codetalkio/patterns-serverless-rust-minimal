@@ -33,322 +33,330 @@ The following are the response time results from AWS XRay, generated after runni
 
 | Measurement (128 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 30 ms |
-| Average cold start response time | 145 ms |
-| Fastest warm response time | 6 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 134 ms |
-| Slowest cold response time | 156 ms |
+| Average warm start response time | 37 ms |
+| Average cold start response time | 142.5 ms |
+| Fastest warm response time | 6.9 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 131 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 128 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 128 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 128 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 128 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 128 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 128 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 128 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 128 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 128 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 128 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 128 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 128 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 128 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 128 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 128 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 128 MB |
 
 ## Results for 256 MB
 
 | Measurement (256 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 24.4 ms |
-| Average cold start response time | 124.2 ms |
-| Fastest warm response time | 6 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 106.9 ms |
-| Slowest cold response time | 156 ms |
+| Average warm start response time | 8.6 ms |
+| Average cold start response time | 137 ms |
+| Fastest warm response time | 6.9 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 105 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 32.9 ms |  | 24.3 ms | 0.1 ms | 🥵 | 256 MB |
-| 120 ms | 18.7 ms | 0.4 ms | 0.2 ms | 🥶 | 256 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 256 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 256 MB |
-| 9.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 256 MB |
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 256 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 256 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 256 MB |
-| 26 ms |  | 17.8 ms | 0.4 ms | 🥵 | 256 MB |
-| 8 ms |  | 0.5 ms | 0.1 ms | 🥵 | 256 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 256 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 256 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 256 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 256 MB |
-| 7.9 ms |  | 0.5 ms | 0.1 ms | 🥵 | 256 MB |
-| 106.9 ms | 33.4 ms | 0.6 ms | 0.4 ms | 🥶 | 256 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 256 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 256 MB |
+| 19.9 ms |  | 13.1 ms | 0.1 ms | 🥵 | 256 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 256 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 256 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 256 MB |
+| 34.9 ms |  | 8.8 ms | 19.5 ms | 🥵 | 256 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 256 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 256 MB |
+| 105 ms | 22.9 ms | 0.4 ms | 0.1 ms | 🥶 | 256 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 256 MB |
+| 9 ms |  | 0.3 ms | 0 ms | 🥵 | 256 MB |
+| 9.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 256 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 256 MB |
+| 121.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 256 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 256 MB |
 
 ## Results for 512 MB
 
 | Measurement (512 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 11.4 ms |
-| Average cold start response time | 120.6 ms |
-| Fastest warm response time | 6 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 106.9 ms |
-| Slowest cold response time | 156 ms |
+| Average warm start response time | 14.3 ms |
+| Average cold start response time | 139 ms |
+| Fastest warm response time | 5.9 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 105 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 32.9 ms |  | 24.3 ms | 0.1 ms | 🥵 | 512 MB |
-| 120 ms | 18.7 ms | 0.4 ms | 0.2 ms | 🥶 | 512 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
 | 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 512 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 512 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 512 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
+| 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
+| 19.9 ms |  | 13.1 ms | 0.1 ms | 🥵 | 512 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
+| 8.9 ms |  | 0.2 ms | 0.2 ms | 🥵 | 512 MB |
+| 118.9 ms | 17.1 ms | 0.5 ms | 0 ms | 🥶 | 512 MB |
+| 9 ms |  | 0.3 ms | 0 ms | 🥵 | 512 MB |
+| 9.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
+| 121.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 512 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 512 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 512 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 512 MB |
-| 137 ms | 28.2 ms | 1.1 ms | 0.2 ms | 🥶 | 512 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
-| 26 ms |  | 17.8 ms | 0.4 ms | 🥵 | 512 MB |
-| 9.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
-| 8 ms |  | 0.5 ms | 0.1 ms | 🥵 | 512 MB |
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 512 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 512 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 512 MB |
-| 132.9 ms | 24.7 ms | 0.7 ms | 0.2 ms | 🥶 | 512 MB |
-| 7.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 512 MB |
-| 106.9 ms | 33.4 ms | 0.6 ms | 0.4 ms | 🥶 | 512 MB |
-| 6 ms |  | 0.6 ms | 0.1 ms | 🥵 | 512 MB |
-| 7.9 ms |  | 0.5 ms | 0.1 ms | 🥵 | 512 MB |
+| 105 ms | 22.9 ms | 0.4 ms | 0.1 ms | 🥶 | 512 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 512 MB |
+| 133 ms | 28.5 ms | 0.5 ms | 0.1 ms | 🥶 | 512 MB |
+| 8.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 512 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 512 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 512 MB |
+| 34.9 ms |  | 8.8 ms | 19.5 ms | 🥵 | 512 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 512 MB |
+| 5.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 512 MB |
 
 ## Results for 1024 MB
 
 | Measurement (1024 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 9.3 ms |
-| Average cold start response time | 122.8 ms |
-| Fastest warm response time | 6 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 106.9 ms |
-| Slowest cold response time | 156 ms |
+| Average warm start response time | 9.2 ms |
+| Average cold start response time | 135.6 ms |
+| Fastest warm response time | 5.9 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 101 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 32.9 ms |  | 24.3 ms | 0.1 ms | 🥵 | 1024 MB |
-| 120 ms | 18.7 ms | 0.4 ms | 0.2 ms | 🥶 | 1024 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
 | 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 1024 MB |
-| 8 ms |  | 0.3 ms | 0.3 ms | 🥵 | 1024 MB |
-| 6 ms |  | 0.5 ms | 0.2 ms | 🥵 | 1024 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 1024 MB |
-| 9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 1024 MB |
+| 19.9 ms |  | 13.1 ms | 0.1 ms | 🥵 | 1024 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
+| 101 ms | 28.6 ms | 0.5 ms | 0.2 ms | 🥶 | 1024 MB |
+| 8.9 ms |  | 0.2 ms | 0.2 ms | 🥵 | 1024 MB |
+| 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
+| 8 ms |  | 0.4 ms | 0.2 ms | 🥵 | 1024 MB |
+| 148.9 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 1024 MB |
+| 6 ms |  | 0.4 ms | 0.4 ms | 🥵 | 1024 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
+| 118.9 ms | 17.1 ms | 0.5 ms | 0 ms | 🥶 | 1024 MB |
+| 9 ms |  | 0.3 ms | 0 ms | 🥵 | 1024 MB |
+| 9.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 1024 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 1024 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 1024 MB |
-| 9.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
-| 137 ms | 28.2 ms | 1.1 ms | 0.2 ms | 🥶 | 1024 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
-| 26 ms |  | 17.8 ms | 0.4 ms | 🥵 | 1024 MB |
-| 8 ms |  | 0.5 ms | 0.1 ms | 🥵 | 1024 MB |
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 1024 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 1024 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 1024 MB |
-| 132.9 ms | 24.7 ms | 0.7 ms | 0.2 ms | 🥶 | 1024 MB |
-| 7.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 1024 MB |
+| 121.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 1024 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 1024 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
+| 24 ms |  | 0.5 ms | 0 ms | 🥵 | 1024 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
-| 6 ms |  | 0.6 ms | 0.1 ms | 🥵 | 1024 MB |
-| 142.9 ms | 25.7 ms | 0.6 ms | 0.3 ms | 🥶 | 1024 MB |
-| 7.9 ms |  | 0.5 ms | 0.1 ms | 🥵 | 1024 MB |
-| 106.9 ms | 33.4 ms | 0.6 ms | 0.4 ms | 🥶 | 1024 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 1024 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 1024 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
+| 133 ms | 28.5 ms | 0.5 ms | 0.1 ms | 🥶 | 1024 MB |
+| 6.9 ms |  | 0.4 ms | 0 ms | 🥵 | 1024 MB |
+| 105 ms | 22.9 ms | 0.4 ms | 0.1 ms | 🥶 | 1024 MB |
+| 34.9 ms |  | 8.8 ms | 19.5 ms | 🥵 | 1024 MB |
+| 5.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 1024 MB |
+| 8.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
+| 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 1024 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 1024 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 1024 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 1024 MB |
 
 ## Results for 2048 MB
 
 | Measurement (2048 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 7.1 ms |
-| Average cold start response time | 118.9 ms |
-| Fastest warm response time | 6 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 102.9 ms |
-| Slowest cold response time | 156 ms |
+| Average warm start response time | 8.5 ms |
+| Average cold start response time | 144.2 ms |
+| Fastest warm response time | 5.9 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 101 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 32.9 ms |  | 24.3 ms | 0.1 ms | 🥵 | 2048 MB |
-| 120 ms | 18.7 ms | 0.4 ms | 0.2 ms | 🥶 | 2048 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 19.9 ms |  | 13.1 ms | 0.1 ms | 🥵 | 2048 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 101 ms | 28.6 ms | 0.5 ms | 0.2 ms | 🥶 | 2048 MB |
+| 8.9 ms |  | 0.2 ms | 0.2 ms | 🥵 | 2048 MB |
 | 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 2048 MB |
-| 8 ms |  | 0.3 ms | 0.3 ms | 🥵 | 2048 MB |
-| 6 ms |  | 0.5 ms | 0.2 ms | 🥵 | 2048 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 2048 MB |
-| 9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 2048 MB |
-| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 2048 MB |
-| 145.9 ms | 20.6 ms | 0.6 ms | 0.4 ms | 🥶 | 2048 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 2048 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 2048 MB |
-| 137 ms | 28.2 ms | 1.1 ms | 0.2 ms | 🥶 | 2048 MB |
-| 26 ms |  | 17.8 ms | 0.4 ms | 🥵 | 2048 MB |
-| 9.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
-| 8 ms |  | 0.5 ms | 0.1 ms | 🥵 | 2048 MB |
-| 8 ms |  | 0.3 ms | 0.2 ms | 🥵 | 2048 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
-| 14 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
+| 11 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 6 ms |  | 0.4 ms | 0.4 ms | 🥵 | 2048 MB |
 | 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 2048 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 2048 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 2048 MB |
-| 132.9 ms | 24.7 ms | 0.7 ms | 0.2 ms | 🥶 | 2048 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 2048 MB |
-| 102.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 2048 MB |
-| 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 2048 MB |
-| 142.9 ms | 25.7 ms | 0.6 ms | 0.3 ms | 🥶 | 2048 MB |
-| 7.9 ms |  | 0.5 ms | 0.1 ms | 🥵 | 2048 MB |
-| 7.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 2048 MB |
-| 106.9 ms | 33.4 ms | 0.6 ms | 0.4 ms | 🥶 | 2048 MB |
+| 118.9 ms | 17.1 ms | 0.5 ms | 0 ms | 🥶 | 2048 MB |
+| 8 ms |  | 0.4 ms | 0.2 ms | 🥵 | 2048 MB |
+| 111.9 ms | 31.4 ms | 0.4 ms | 0.3 ms | 🥶 | 2048 MB |
+| 148.9 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 2048 MB |
+| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 9 ms |  | 0.3 ms | 0 ms | 🥵 | 2048 MB |
+| 9.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
+| 24 ms |  | 0.5 ms | 0 ms | 🥵 | 2048 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
-| 6 ms |  | 0.6 ms | 0.1 ms | 🥵 | 2048 MB |
+| 121.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 2048 MB |
+| 8 ms |  | 0.3 ms | 0.2 ms | 🥵 | 2048 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 2048 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 2048 MB |
+| 105 ms | 22.9 ms | 0.4 ms | 0.1 ms | 🥶 | 2048 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 2048 MB |
+| 133 ms | 28.5 ms | 0.5 ms | 0.1 ms | 🥶 | 2048 MB |
+| 6.9 ms |  | 0.4 ms | 0 ms | 🥵 | 2048 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 144 ms | 24.7 ms | 0.6 ms | 0.2 ms | 🥶 | 2048 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 34.9 ms |  | 8.8 ms | 19.5 ms | 🥵 | 2048 MB |
+| 5.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
+| 8.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 2048 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 2048 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 2048 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 2048 MB |
+| 8.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 2048 MB |
+| 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 2048 MB |
 
 ## Results for 3072 MB
 
 | Measurement (3072 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 7 ms |
-| Average cold start response time | 113.6 ms |
+| Average warm start response time | 8.7 ms |
+| Average cold start response time | 144.7 ms |
 | Fastest warm response time | 4.9 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 102.9 ms |
-| Slowest cold response time | 156 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 86 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 32.9 ms |  | 24.3 ms | 0.1 ms | 🥵 | 3072 MB |
-| 120 ms | 18.7 ms | 0.4 ms | 0.2 ms | 🥶 | 3072 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
 | 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 3072 MB |
-| 8 ms |  | 0.3 ms | 0.3 ms | 🥵 | 3072 MB |
-| 6 ms |  | 0.5 ms | 0.2 ms | 🥵 | 3072 MB |
-| 110.9 ms | 18.4 ms | 0.4 ms | 0.1 ms | 🥶 | 3072 MB |
-| 9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 3072 MB |
-| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 3072 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 3072 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 3072 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 11 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 86 ms | 18.3 ms | 0.4 ms | 0.1 ms | 🥶 | 3072 MB |
+| 19.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 3072 MB |
+| 101 ms | 28.6 ms | 0.5 ms | 0.2 ms | 🥶 | 3072 MB |
 | 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
-| 145.9 ms | 20.6 ms | 0.6 ms | 0.4 ms | 🥶 | 3072 MB |
-| 13 ms |  | 0.3 ms | 0 ms | 🥵 | 3072 MB |
-| 137 ms | 28.2 ms | 1.1 ms | 0.2 ms | 🥶 | 3072 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 3072 MB |
-| 9.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
-| 7.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 3072 MB |
-| 26 ms |  | 17.8 ms | 0.4 ms | 🥵 | 3072 MB |
-| 14 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
-| 8 ms |  | 0.5 ms | 0.1 ms | 🥵 | 3072 MB |
-| 8 ms |  | 0.3 ms | 0.2 ms | 🥵 | 3072 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 8 ms |  | 0.4 ms | 0.2 ms | 🥵 | 3072 MB |
+| 6 ms |  | 0.4 ms | 0.4 ms | 🥵 | 3072 MB |
+| 148.9 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 3072 MB |
 | 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
-| 12 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 3072 MB |
-| 120 ms | 21.8 ms | 0.6 ms | 0.2 ms | 🥶 | 3072 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 3072 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 3072 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 3072 MB |
-| 4.9 ms |  | 0.3 ms | 0 ms | 🥵 | 3072 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 3072 MB |
-| 132.9 ms | 24.7 ms | 0.7 ms | 0.2 ms | 🥶 | 3072 MB |
-| 142.9 ms | 25.7 ms | 0.6 ms | 0.3 ms | 🥶 | 3072 MB |
-| 7.9 ms |  | 0.5 ms | 0.1 ms | 🥵 | 3072 MB |
-| 7.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 3072 MB |
-| 102.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 3072 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 24 ms |  | 0.5 ms | 0 ms | 🥵 | 3072 MB |
+| 111.9 ms | 31.4 ms | 0.4 ms | 0.3 ms | 🥶 | 3072 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 121.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 3072 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 105 ms | 17.8 ms | 0.6 ms | 0.3 ms | 🥶 | 3072 MB |
+| 6.9 ms |  | 0.4 ms | 0 ms | 🥵 | 3072 MB |
+| 9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 105 ms | 22.9 ms | 0.4 ms | 0.1 ms | 🥶 | 3072 MB |
+| 19.9 ms |  | 13.1 ms | 0.1 ms | 🥵 | 3072 MB |
+| 8.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 3072 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 8.9 ms |  | 0.2 ms | 0.2 ms | 🥵 | 3072 MB |
+| 8 ms |  | 0.3 ms | 0.2 ms | 🥵 | 3072 MB |
+| 118.9 ms | 17.1 ms | 0.5 ms | 0 ms | 🥶 | 3072 MB |
+| 9 ms |  | 0.3 ms | 0 ms | 🥵 | 3072 MB |
+| 9.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 3072 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 133 ms | 28.5 ms | 0.5 ms | 0.1 ms | 🥶 | 3072 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 3072 MB |
+| 144 ms | 24.7 ms | 0.6 ms | 0.2 ms | 🥶 | 3072 MB |
+| 6.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 3072 MB |
+| 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 8.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 3072 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 3072 MB |
+| 34.9 ms |  | 8.8 ms | 19.5 ms | 🥵 | 3072 MB |
+| 5.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 3072 MB |
 | 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 3072 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 3072 MB |
-| 106.9 ms | 33.4 ms | 0.6 ms | 0.4 ms | 🥶 | 3072 MB |
-| 6 ms |  | 0.6 ms | 0.1 ms | 🥵 | 3072 MB |
+| 13.9 ms |  | 0.3 ms | 0 ms | 🥵 | 3072 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 3072 MB |
+| 4.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 3072 MB |
 
 ## Results for 4096 MB
 
 | Measurement (4096 MB) | Time (ms) |
 |-------------|------|
-| Average warm start response time | 8.3 ms |
-| Average cold start response time | 123.8 ms |
+| Average warm start response time | 10.2 ms |
+| Average cold start response time | 143.7 ms |
 | Fastest warm response time | 4.9 ms |
-| Slowest warm response time | 121.9 ms |
-| Fastest cold response time  | 98.9 ms |
-| Slowest cold response time | 156 ms |
+| Slowest warm response time | 62 ms |
+| Fastest cold response time  | 86 ms |
+| Slowest cold response time | 154 ms |
   
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
-| 8 ms |  | 0.3 ms | 0.3 ms | 🥵 | 4096 MB |
-| 32.9 ms |  | 24.3 ms | 0.1 ms | 🥵 | 4096 MB |
-| 120 ms | 18.7 ms | 0.4 ms | 0.2 ms | 🥶 | 4096 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 4096 MB |
-| 6 ms |  | 0.5 ms | 0.2 ms | 🥵 | 4096 MB |
 | 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
-| 9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
-| 6 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 9 ms |  | 0.6 ms | 0.2 ms | 🥵 | 4096 MB |
-| 145.9 ms | 20.6 ms | 0.6 ms | 0.4 ms | 🥶 | 4096 MB |
-| 156 ms | 27.9 ms | 0.7 ms | 0.5 ms | 🥶 | 4096 MB |
+| 19.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 4096 MB |
+| 86 ms | 18.3 ms | 0.4 ms | 0.1 ms | 🥶 | 4096 MB |
+| 101 ms | 28.6 ms | 0.5 ms | 0.2 ms | 🥶 | 4096 MB |
+| 7 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
 | 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
-| 44 ms |  | 37 ms | 0.1 ms | 🥵 | 4096 MB |
-| 9.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 137 ms | 28.2 ms | 1.1 ms | 0.2 ms | 🥶 | 4096 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 7.9 ms |  | 0.6 ms | 0 ms | 🥵 | 4096 MB |
-| 27 ms |  | 19.1 ms | 0.1 ms | 🥵 | 4096 MB |
-| 121.9 ms |  | 40 ms | 59.9 ms | 🥵 | 4096 MB |
-| 7.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
-| 134 ms | 17.5 ms | 0.9 ms | 3.2 ms | 🥶 | 4096 MB |
+| 11 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 121 ms | 17.6 ms | 0.5 ms | 0.1 ms | 🥶 | 4096 MB |
+| 6 ms |  | 0.4 ms | 0.4 ms | 🥵 | 4096 MB |
 | 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
-| 102.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 4096 MB |
-| 4.9 ms |  | 0.3 ms | 0 ms | 🥵 | 4096 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 4096 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 4096 MB |
-| 142.9 ms | 25.7 ms | 0.6 ms | 0.3 ms | 🥶 | 4096 MB |
-| 7.9 ms |  | 0.3 ms | 0.3 ms | 🥵 | 4096 MB |
-| 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 6 ms |  | 0.6 ms | 0.1 ms | 🥵 | 4096 MB |
-| 98.9 ms | 20.8 ms | 0.8 ms | 0.4 ms | 🥶 | 4096 MB |
-| 7.9 ms |  | 0.4 ms | 0 ms | 🥵 | 4096 MB |
-| 108.9 ms | 20.5 ms | 0.6 ms | 0 ms | 🥶 | 4096 MB |
-| 7.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
-| 110.9 ms | 18.4 ms | 0.4 ms | 0.1 ms | 🥶 | 4096 MB |
+| 8 ms |  | 0.4 ms | 0.2 ms | 🥵 | 4096 MB |
+| 111.9 ms | 31.4 ms | 0.4 ms | 0.3 ms | 🥶 | 4096 MB |
+| 148.9 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 4096 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 121.9 ms | 29.4 ms | 0.5 ms | 0.1 ms | 🥶 | 4096 MB |
+| 59 ms |  | 40.3 ms | 0.1 ms | 🥵 | 4096 MB |
 | 9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
-| 6 ms |  | 0.4 ms | 0.2 ms | 🥵 | 4096 MB |
-| 13 ms |  | 0.3 ms | 0 ms | 🥵 | 4096 MB |
-| 6.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 4096 MB |
-| 7.9 ms |  | 0.4 ms | 0.2 ms | 🥵 | 4096 MB |
-| 26 ms |  | 17.8 ms | 0.4 ms | 🥵 | 4096 MB |
+| 24 ms |  | 0.5 ms | 0 ms | 🥵 | 4096 MB |
+| 9 ms |  | 0.4 ms | 0 ms | 🥵 | 4096 MB |
+| 105 ms | 22.9 ms | 0.4 ms | 0.1 ms | 🥶 | 4096 MB |
+| 131.9 ms | 19.4 ms | 0.6 ms | 0.4 ms | 🥶 | 4096 MB |
+| 6.9 ms |  | 0.4 ms | 0 ms | 🥵 | 4096 MB |
+| 105 ms | 17.8 ms | 0.6 ms | 0.3 ms | 🥶 | 4096 MB |
+| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
+| 19.9 ms |  | 13.1 ms | 0.1 ms | 🥵 | 4096 MB |
+| 8.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
+| 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 118.9 ms | 17.1 ms | 0.5 ms | 0 ms | 🥶 | 4096 MB |
+| 9 ms |  | 0.3 ms | 0 ms | 🥵 | 4096 MB |
+| 9.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
+| 7.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 8.9 ms |  | 0.2 ms | 0.2 ms | 🥵 | 4096 MB |
 | 8 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
-| 14 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 62 ms |  | 34.9 ms | 19.8 ms | 🥵 | 4096 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
+| 131 ms | 24.8 ms | 0.5 ms | 0.3 ms | 🥶 | 4096 MB |
+| 144 ms | 24.7 ms | 0.6 ms | 0.2 ms | 🥶 | 4096 MB |
+| 8 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
 | 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 8 ms |  | 0.5 ms | 0.1 ms | 🥵 | 4096 MB |
-| 12 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
-| 106.9 ms | 33.4 ms | 0.6 ms | 0.4 ms | 🥶 | 4096 MB |
-| 120 ms | 21.8 ms | 0.6 ms | 0.2 ms | 🥶 | 4096 MB |
-| 6.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
-| 132.9 ms | 24.7 ms | 0.7 ms | 0.2 ms | 🥶 | 4096 MB |
-| 7.9 ms |  | 0.5 ms | 0.1 ms | 🥵 | 4096 MB |
+| 133 ms | 28.5 ms | 0.5 ms | 0.1 ms | 🥶 | 4096 MB |
+| 12 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 6.9 ms |  | 0.3 ms | 0 ms | 🥵 | 4096 MB |
+| 6.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
+| 34.9 ms |  | 8.8 ms | 19.5 ms | 🥵 | 4096 MB |
+| 5.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
+| 8.9 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 8 ms |  | 0.4 ms | 0.1 ms | 🥵 | 4096 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
+| 9.9 ms |  | 0.4 ms | 0 ms | 🥵 | 4096 MB |
+| 154 ms | 24.9 ms | 0.6 ms | 0.1 ms | 🥶 | 4096 MB |
+| 6.9 ms |  | 0.3 ms | 0.1 ms | 🥵 | 4096 MB |
+| 4.9 ms |  | 0.3 ms | 0.2 ms | 🥵 | 4096 MB |
+| 13.9 ms |  | 0.3 ms | 0 ms | 🥵 | 4096 MB |
 
 
 ## XRay Example of a Cold Start
