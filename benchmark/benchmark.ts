@@ -25,8 +25,8 @@ const chartistSvg = require("svg-chartist");
 /**
  * Benchmark configuration values.
  */
-const COLD_STARTS = 50;
-const WARM_STARTS = 2;
+const COLD_STARTS = 100;
+const WARM_STARTS = 100;
 const MEMORY_SIZES = [128, 256, 512, 1024, 2048, 3072, 4096];
 
 /**
@@ -196,21 +196,29 @@ const invokeFunctions = async (functionName: string, memorySize: number) => {
       },
     },
   });
-  const testPayload: InvokeCommandInput = {
-    FunctionName: functionName,
-    Payload: Buffer.from(benchmarkPayload),
+  const testPayload: () => InvokeCommandInput = () => {
+    // Dynamically replace placeholders in the payload, so we can generate unique
+    // test data per invocation.
+    const payload = JSON.stringify(benchmarkPayload)
+      .replace("##DATE##", new Date().toISOString())
+      .replace("##NUM##", `${Math.floor(Math.random() * 10000)}`);
+    return {
+      FunctionName: functionName,
+      Payload: Buffer.from(payload),
+    };
   };
 
   for (let cI = 0; cI < COLD_STARTS; cI++) {
     console.log("[BENCHMARK] Updating the function to ensure a cold start.");
     await lambdaClient.send(new UpdateFunctionConfigurationCommand(updateConfiguration()));
     console.log("[BENCHMARK] Invoke cold-start function.");
-    await lambdaClient.send(new InvokeCommand(testPayload));
-    for (let wI = 0; wI < WARM_STARTS; wI++) {
-      console.log("[BENCHMARK] Invoke warm-start function.");
-      await sleep(500);
-      await lambdaClient.send(new InvokeCommand(testPayload));
-    }
+    await lambdaClient.send(new InvokeCommand(testPayload()));
+    await sleep(500);
+  }
+  for (let wI = 0; wI < WARM_STARTS; wI++) {
+    console.log("[BENCHMARK] Invoke warm-start function.");
+    await sleep(500);
+    await lambdaClient.send(new InvokeCommand(testPayload()));
   }
 };
 
