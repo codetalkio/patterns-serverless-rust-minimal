@@ -22,8 +22,8 @@ import * as pkg from "../package.json";
 const chartistSvg = require("svg-chartist");
 
 // Configuration of the benchmark.
-const COLD_STARTS = 2;
-const WARM_STARTS = 3;
+const COLD_STARTS = 50;
+const WARM_STARTS = 4;
 const MEMORY_SIZES = [128, 256, 512, 1024, 2048, 3072, 4096];
 
 const { BENCHMARK_SUFFIX, DRY_RUN } = process.env;
@@ -522,8 +522,6 @@ const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[])
     process.exit(1);
   }
 
-  const benchmarkStartTime = new Date();
-
   const memoryTimes: MemoryTimes[] = [];
   if (DRY_RUN === "true") {
     // If we are running a dry run, we only need to load in the existing traces and process them.
@@ -539,6 +537,7 @@ const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[])
     // For each memory configuration, go through the benchmark process.
     const memoryTraces: MemoryTraces[] = [];
     for (let i = 0; i < MEMORY_SIZES.length; i++) {
+      const benchmarkStartTime = new Date();
       const memorySize = MEMORY_SIZES[i];
       await invokeFunctions(functionName, memorySize);
       const traceSummaries = await fetchXRayTraceSummaries(functionName, benchmarkStartTime);
@@ -552,6 +551,7 @@ const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[])
         memorySize,
         times,
       });
+      await sleep(5000);
     }
     fs.writeFileSync("./benchmark/traces.json", JSON.stringify(memoryTraces));
   }
