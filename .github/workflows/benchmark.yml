@@ -1,10 +1,11 @@
 name: benchmark
 
 # Refer to https://help.github.com/en/articles/workflow-syntax-for-github-actions for documentation on Actions.
-on:
-  release:
-    types:
-      - prereleased
+# on:
+#   release:
+#     types:
+#       - prereleased
+on: push
 
 jobs:
   benchmark:
@@ -38,10 +39,10 @@ jobs:
             ~/.cargo/git
             target
           key: cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: "Setup node dependencies"
-        uses: ./.github/actions/setup-node-deps
-      - name: "Build asset"
-        uses: ./.github/actions/build-asset
+      # - name: "Setup node dependencies"
+      #   uses: ./.github/actions/setup-node-deps
+      # - name: "Build asset"
+      #   uses: ./.github/actions/build-asset
 
       - name: Benchmark
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
@@ -51,13 +52,15 @@ jobs:
           AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
           CI: "true"
         run: |
-          npm run benchmark
+          export BENCHMARK_SUFFIX=$$RANDOM
+          echo $BENCHMARK_SUFFIX
+          # npm run benchmark
 
-      - name: Commit benchmark results
-        uses: codetalkio/add-and-commit@v6
-        with:
-          author_name: GitHub Actions
-          author_email: no-reply@codetalk.io
-          message: "Bot: Updating benchmark results"
-          add: "./benchmark/*"
-          branch: master
+      # - name: Commit benchmark results
+      #   uses: codetalkio/add-and-commit@v6
+      #   with:
+      #     author_name: GitHub Actions
+      #     author_email: no-reply@codetalk.io
+      #     message: "Bot: Updating benchmark results"
+      #     add: "./benchmark/*"
+      #     branch: master

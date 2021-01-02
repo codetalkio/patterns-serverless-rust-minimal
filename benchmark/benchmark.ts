@@ -18,14 +18,15 @@ import {
 import * as fs from "fs";
 
 import * as pkg from "../package.json";
+import * as benchmarkPayload from "./benchmark-payload.json";
 
 const chartistSvg = require("svg-chartist");
 
 /**
  * Benchmark configuration values.
  */
-const COLD_STARTS = 50;
-const WARM_STARTS = 2;
+const COLD_STARTS = 1;
+const WARM_STARTS = 0;
 const MEMORY_SIZES = [128, 256, 512, 1024, 2048, 3072, 4096];
 
 /**
@@ -107,12 +108,164 @@ interface SubSegment {
 }
 
 /**
+ * Run the benchmark by:
+ * - Iterating through memory configurations.
+ * - Updating the Lambda with each memory configuration.
+ * - Invoking the Lambda for n cold starts and m warm starts.
+ * - Extract all XRay traces.
+ * - Process the traces to get the benchmark results.
+ * - Output a markdown table and two charts.
+ *
+ * If you just want to reprocess the results, run the benchmark with `DRY_RUN`,
+ * e.g. `DRY_RUN=true npm run benchmark`. This will skip deployment, teardown, invocations, and
+ * fetching of XRay traces, and instead load the existing traces from `traces.json` and generate
+ * the output again.
+ */
+const main = async (functionName: string) => {
+  const memoryTimes: MemoryTimes[] = [];
+  if (DRY_RUN === "true") {
+    // If we are running a dry run, we only need to load in the existing traces and process them.
+    const memoryTraces = JSON.parse(fs.readFileSync("./benchmark/traces.json").toString());
+    memoryTraces.forEach(({ memorySize, traces: traceBatches }: MemoryTraces) => {
+      const times = processXRayTraces(traceBatches);
+      memoryTimes.push({
+        memorySize,
+        times,
+      });
+    });
+  } else {
+    // For each memory configuration, go through the benchmark process.
+    const memoryTraces: MemoryTraces[] = [];
+    for (let i = 0; i < MEMORY_SIZES.length; i++) {
+      const benchmarkStartTime = new Date();
+      const memorySize = MEMORY_SIZES[i];
+      await invokeFunctions(functionName, memorySize);
+      const traceSummaries = await fetchXRayTraceSummaries(functionName, benchmarkStartTime);
+      const traceBatches = await fetchXRayTraceBatches(traceSummaries);
+      memoryTraces.push({
+        memorySize,
+        traces: traceBatches,
+      });
+      const times = processXRayTraces(traceBatches);
+      memoryTimes.push({
+        memorySize,
+        times,
+      });
+      await sleep(5000);
+    }
+    fs.writeFileSync("./benchmark/traces.json", JSON.stringify(memoryTraces));
+  }
+
+  outputBenchmarkMarkdown(memoryTimes);
+  outputBenchmarkChart(memoryTimes);
+};
+
+/**
  * Sleep for the specified time.
  */
 const sleep = (ms: number) => {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+};
+
+/**
+ * Run the actual benchmark, performing a series of invocations to the Lambda. To ensure cold
+ * starts, we trigger an update on the functions environment variables before invoking it. We
+ * then invoke it a number of times afterwards to gather warm startup data as well.
+ *
+ * The `memorySize` configuration sets the Lambda memory size, allowing easy scale up and down.
+ */
+const invokeFunctions = async (functionName: string, memorySize: number) => {
+  const lambdaClient = new LambdaClient({});
+  const baseConfiguration = await lambdaClient.send(
+    new GetFunctionConfigurationCommand({
+      FunctionName: functionName,
+    })
+  );
+
+  // We generate the update configuration on the fly to always provide a unique
+  // benchmark run time.
+  const updateConfiguration: () => UpdateFunctionConfigurationCommandInput = () => ({
+    FunctionName: functionName,
+    MemorySize: memorySize,
+    Environment: {
+      Variables: {
+        ...baseConfiguration.Environment?.Variables,
+        BENCHMARK_RUN_TIME: `${new Date().toISOString()}-${Math.random()}`,
+      },
+    },
+  });
+  const testPayload: InvokeCommandInput = {
+    FunctionName: functionName,
+    Payload: Buffer.from(benchmarkPayload),
+  };
+
+  for (let cI = 0; cI < COLD_STARTS; cI++) {
+    console.log("[BENCHMARK] Updating the function to ensure a cold start.");
+    await lambdaClient.send(new UpdateFunctionConfigurationCommand(updateConfiguration()));
+    console.log("[BENCHMARK] Invoke cold-start function.");
+    await lambdaClient.send(new InvokeCommand(testPayload));
+    for (let wI = 0; wI < WARM_STARTS; wI++) {
+      console.log("[BENCHMARK] Invoke warm-start function.");
+      await sleep(500);
+      await lambdaClient.send(new InvokeCommand(testPayload));
+    }
+  }
+};
+
+/**
+ * Fetch all XRay trace summaries, which contain the trace IDs we will need to get the detailed information. We
+ * limit the information we search for by filtering on the `functionName` and on service type of AWS:Lambda. Additionally,
+ * we only look in the period between the `benchmarkStartTime` time and the time that this function is called.
+ *
+ * Since XRay trace can take some time to appear, we also gracefully handle waiting if we don't see at least 90% of
+ * the traces in the results.
+ */
+const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime: Date): Promise<TraceSummary[]> => {
+  const benchmarkEndTime = new Date();
+  const xRayClient = new XRayClient({});
+
+  console.log("[TRACES] XRay traces take a bit of time to appear, so we wait 10 seconds before requesting.");
+  await sleep(10000);
+
+  const traceSummaries: TraceSummary[] = [];
+  let nextTokenSummary: string | undefined;
+  let retries = 0;
+  let retry = true;
+  while (retry) {
+    const traceInput: GetTraceSummariesCommandInput = {
+      StartTime: benchmarkStartTime,
+      EndTime: benchmarkEndTime,
+      FilterExpression: `service(id(name: "${functionName}", type: "AWS::Lambda"))`,
+      NextToken: nextTokenSummary,
+    };
+    const traceSummariesRes = await xRayClient.send(new GetTraceSummariesCommand(traceInput));
+    nextTokenSummary = traceSummariesRes.NextToken;
+    traceSummaries.push(...(traceSummariesRes.TraceSummaries ?? []));
+
+    // Make sure we've fetched all our traces. We only require 90% to have been gathered, since
+    // XRay is sampling our requests.
+    if ((traceSummariesRes.TraceSummaries?.length ?? 0) + traceSummaries.length < COLD_STARTS * WARM_STARTS * 0.9) {
+      if (retries >= 20) {
+        console.error(
+          `[TEARDOWN] Failed to get all traces for the invocations, was only able to find '${traceSummariesRes.TraceSummaries?.length}' traces.`
+        );
+        process.exit(0);
+      }
+      console.log("[TRACES] Traces has still not appeared, waiting 1 seconds and trying again...");
+      await sleep(1000);
+      retries++;
+    } else {
+      retry = false;
+    }
+
+    if (!retry && nextTokenSummary === undefined) {
+      break;
+    }
+  }
+  console.log("[TRACES] Fetched trace summaries, fetching detailed trace information.");
+  return traceSummaries;
 };
 
 /**
@@ -124,6 +277,71 @@ const chunkArray = (arr: any[], size: number) => {
     results.push(arr.splice(0, size));
   }
   return results;
+};
+
+/**
+ * Once we have a list of trace IDs, we can get the detailed trace information which contain the breakdown
+ * of the different stages the Lambda function went through.
+ *
+ * Because the XRay API is limited to fetching 5 traces at a time, we divide all the trace IDs into chunks of
+ * 5. Additionally, we re-request traces if we detect any that are unprocessed.
+ *
+ * NOTE: To avoid leaking information, all traces are stripped of information and only a whitelist is saved.
+ */
+const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[]): Promise<MinimalTrace[]> => {
+  const xRayClient = new XRayClient({});
+  const batchTraces: MinimalTrace[] = [];
+
+  // We can only request 5 traces at a time, so we split the summary IDs into chunks.
+  const batchSummaryChunks = chunkArray(traceSummaries, 5);
+
+  let nextTokenBatch: string | undefined;
+  for (let i = 0; i < batchSummaryChunks.length; i++) {
+    const batchSummaryChunk = batchSummaryChunks[i];
+    while (true) {
+      const batchInput: BatchGetTracesCommandInput = {
+        TraceIds: [...new Set(batchSummaryChunk.filter((t) => t.Id).map((t) => t.Id!))],
+        NextToken: nextTokenBatch,
+      };
+      const batchTracesRes = await xRayClient.send(new BatchGetTracesCommand(batchInput));
+
+      // Check if there are any unprocessed traces. If there are, we wait 1 second and retry the loop.
+      if ((batchTracesRes.UnprocessedTraceIds?.length ?? 0) > 0) {
+        console.log("[TRACES] Detailed traces are still being processed, waiting 1 second and trying again...");
+        await sleep(1000);
+        continue;
+      }
+
+      // Only store the relevant parts of the traces, so we can't accidentally leak information.
+      const minimalTraces: MinimalTrace[] = (batchTracesRes.Traces ?? []).map((t) => ({
+        Id: t.Id,
+        Segments: (t.Segments ?? [])
+          .filter((s) => s.Document !== undefined)
+          .map((s: any) => {
+            const seg: SegmentDocument = JSON.parse(s.Document!);
+            const cleanedSeg: SegmentDocument = {
+              origin: seg.origin,
+              end_time: seg.end_time,
+              start_time: seg.start_time,
+              subsegments: seg.subsegments?.map((subSeg) => ({
+                name: subSeg.name,
+                end_time: subSeg.end_time,
+                start_time: subSeg.start_time,
+              })),
+            };
+            return cleanedSeg;
+          }),
+      }));
+      batchTraces.push(...minimalTraces);
+
+      nextTokenBatch = batchTracesRes.NextToken;
+      if (nextTokenBatch === undefined) {
+        break;
+      }
+    }
+  }
+
+  return batchTraces;
 };
 
 /**
@@ -371,184 +589,6 @@ const outputBenchmarkChart = async (memoryTimes: MemoryTimes[]) => {
   });
 };
 
-/**
- * Run the actual benchmark, performing a series of invocations to the Lambda. To ensure cold
- * starts, we trigger an update on the functions environment variables before invoking it. We
- * then invoke it a number of times afterwards to gather warm startup data as well.
- *
- * The `memorySize` configuration sets the Lambda memory size, allowing easy scale up and down.
- */
-const invokeFunctions = async (functionName: string, memorySize: number) => {
-  const lambdaClient = new LambdaClient({});
-  const baseConfiguration = await lambdaClient.send(
-    new GetFunctionConfigurationCommand({
-      FunctionName: functionName,
-    })
-  );
-
-  // We generate the update configuration on the fly to always provide a unique
-  // benchmark run time.
-  const updateConfiguration: () => UpdateFunctionConfigurationCommandInput = () => ({
-    FunctionName: functionName,
-    MemorySize: memorySize,
-    Environment: {
-      Variables: {
-        ...baseConfiguration.Environment?.Variables,
-        BENCHMARK_RUN_TIME: `${new Date().toISOString()}-${Math.random()}`,
-      },
-    },
-  });
-  const testPayload: InvokeCommandInput = {
-    FunctionName: functionName,
-    Payload: Buffer.from(JSON.stringify({ firstName: "world" })),
-  };
-
-  for (let cI = 0; cI < COLD_STARTS; cI++) {
-    console.log("[Benchmark] Updating the function to ensure a cold start.");
-    await lambdaClient.send(new UpdateFunctionConfigurationCommand(updateConfiguration()));
-    console.log("[Benchmark] Invoke cold-start function.");
-    await lambdaClient.send(new InvokeCommand(testPayload));
-    for (let wI = 0; wI < WARM_STARTS; wI++) {
-      console.log("[Benchmark] Invoke warm-start function.");
-      await sleep(500);
-      await lambdaClient.send(new InvokeCommand(testPayload));
-    }
-  }
-};
-
-/**
- * Fetch all XRay trace summaries, which contain the trace IDs we will need to get the detailed information. We
- * limit the information we search for by filtering on the `functionName` and on service type of AWS:Lambda. Additionally,
- * we only look in the period between the `benchmarkStartTime` time and the time that this function is called.
- *
- * Since XRay trace can take some time to appear, we also gracefully handle waiting if we don't see at least 90% of
- * the traces in the results.
- */
-const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime: Date): Promise<TraceSummary[]> => {
-  const benchmarkEndTime = new Date();
-  const xRayClient = new XRayClient({});
-
-  console.log("[TRACES] XRay traces take a bit of time to appear, so we wait 10 seconds before requesting.");
-  await sleep(10000);
-
-  const traceSummaries: TraceSummary[] = [];
-  let nextTokenSummary: string | undefined;
-  let retries = 0;
-  let retry = true;
-  while (retry) {
-    const traceInput: GetTraceSummariesCommandInput = {
-      StartTime: benchmarkStartTime,
-      EndTime: benchmarkEndTime,
-      FilterExpression: `service(id(name: "${functionName}", type: "AWS::Lambda"))`,
-      NextToken: nextTokenSummary,
-    };
-    const traceSummariesRes = await xRayClient.send(new GetTraceSummariesCommand(traceInput));
-    nextTokenSummary = traceSummariesRes.NextToken;
-    traceSummaries.push(...(traceSummariesRes.TraceSummaries ?? []));
-
-    // Make sure we've fetched all our traces. We only require 90% to have been gathered, since
-    // XRay is sampling our requests.
-    if ((traceSummariesRes.TraceSummaries?.length ?? 0) + traceSummaries.length < COLD_STARTS * WARM_STARTS * 0.9) {
-      if (retries >= 20) {
-        console.error(
-          `[TEARDOWN] Failed to get all traces for the invocations, was only able to find '${traceSummariesRes.TraceSummaries?.length}' traces.`
-        );
-        process.exit(0);
-      }
-      console.log("[TRACES] Traces has still not appeared, waiting 1 seconds and trying again...");
-      await sleep(1000);
-      retries++;
-    } else {
-      retry = false;
-    }
-
-    if (!retry && nextTokenSummary === undefined) {
-      break;
-    }
-  }
-  console.log("[TRACES] Fetched trace summaries, fetching detailed trace information.");
-  return traceSummaries;
-};
-
-/**
- * Once we have a list of trace IDs, we can get the detailed trace information which contain the breakdown
- * of the different stages the Lambda function went through.
- *
- * Because the XRay API is limited to fetching 5 traces at a time, we divide all the trace IDs into chunks of
- * 5. Additionally, we re-request traces if we detect any that are unprocessed.
- *
- * NOTE: To avoid leaking information, all traces are stripped of information and only a whitelist is saved.
- */
-const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[]): Promise<MinimalTrace[]> => {
-  const xRayClient = new XRayClient({});
-  const batchTraces: MinimalTrace[] = [];
-
-  // We can only request 5 traces at a time, so we split the summary IDs into chunks.
-  const batchSummaryChunks = chunkArray(traceSummaries, 5);
-
-  let nextTokenBatch: string | undefined;
-  for (let i = 0; i < batchSummaryChunks.length; i++) {
-    const batchSummaryChunk = batchSummaryChunks[i];
-    while (true) {
-      const batchInput: BatchGetTracesCommandInput = {
-        TraceIds: [...new Set(batchSummaryChunk.filter((t) => t.Id).map((t) => t.Id!))],
-        NextToken: nextTokenBatch,
-      };
-      const batchTracesRes = await xRayClient.send(new BatchGetTracesCommand(batchInput));
-
-      // Check if there are any unprocessed traces. If there are, we wait 1 second and retry the loop.
-      if ((batchTracesRes.UnprocessedTraceIds?.length ?? 0) > 0) {
-        console.log("[TRACES] Detailed traces are still being processed, waiting 1 second and trying again...");
-        await sleep(1000);
-        continue;
-      }
-
-      // Only store the relevant parts of the traces, so we can't accidentally leak information.
-      const minimalTraces: MinimalTrace[] = (batchTracesRes.Traces ?? []).map((t) => ({
-        Id: t.Id,
-        Segments: (t.Segments ?? [])
-          .filter((s) => s.Document !== undefined)
-          .map((s: any) => {
-            const seg: SegmentDocument = JSON.parse(s.Document!);
-            const cleanedSeg: SegmentDocument = {
-              origin: seg.origin,
-              end_time: seg.end_time,
-              start_time: seg.start_time,
-              subsegments: seg.subsegments?.map((subSeg) => ({
-                name: subSeg.name,
-                end_time: subSeg.end_time,
-                start_time: subSeg.start_time,
-              })),
-            };
-            return cleanedSeg;
-          }),
-      }));
-      batchTraces.push(...minimalTraces);
-
-      nextTokenBatch = batchTracesRes.NextToken;
-      if (nextTokenBatch === undefined) {
-        break;
-      }
-    }
-  }
-
-  return batchTraces;
-};
-
-/**
- * Run the benchmark by:
- * - Iterating through memory configurations.
- * - Updating the Lambda with each memory configuration.
- * - Invoking the Lambda for n cold starts and m warm starts.
- * - Extract all XRay traces.
- * - Process the traces to get the benchmark results.
- * - Output a markdown table and two charts.
- *
- * If you just want to reprocess the results, run the benchmark with `DRY_RUN`,
- * e.g. `DRY_RUN=true npm run benchmark`. This will skip deployment, teardown, invocations, and
- * fetching of XRay traces, and instead load the existing traces from `traces.json` and generate
- * the output again.
- */
 (async () => {
   const functionName = `${STACK_NAME}-main`;
   console.log(`[SETUP] BENCHMARK_SUFFIX = ${BENCHMARK_SUFFIX}`);
@@ -558,40 +598,10 @@ const fetchXRayTraceBatches = async (traceSummaries: Pick<TraceSummary, "Id">[])
     process.exit(1);
   }
 
-  const memoryTimes: MemoryTimes[] = [];
-  if (DRY_RUN === "true") {
-    // If we are running a dry run, we only need to load in the existing traces and process them.
-    const memoryTraces = JSON.parse(fs.readFileSync("./benchmark/traces.json").toString());
-    memoryTraces.forEach(({ memorySize, traces: traceBatches }: MemoryTraces) => {
-      const times = processXRayTraces(traceBatches);
-      memoryTimes.push({
-        memorySize,
-        times,
-      });
-    });
-  } else {
-    // For each memory configuration, go through the benchmark process.
-    const memoryTraces: MemoryTraces[] = [];
-    for (let i = 0; i < MEMORY_SIZES.length; i++) {
-      const benchmarkStartTime = new Date();
-      const memorySize = MEMORY_SIZES[i];
-      await invokeFunctions(functionName, memorySize);
-      const traceSummaries = await fetchXRayTraceSummaries(functionName, benchmarkStartTime);
-      const traceBatches = await fetchXRayTraceBatches(traceSummaries);
-      memoryTraces.push({
-        memorySize,
-        traces: traceBatches,
-      });
-      const times = processXRayTraces(traceBatches);
-      memoryTimes.push({
-        memorySize,
-        times,
-      });
-      await sleep(5000);
-    }
-    fs.writeFileSync("./benchmark/traces.json", JSON.stringify(memoryTraces));
+  try {
+    await main(functionName);
+  } catch (err) {
+    console.error("[ERROR] Benchmark failed unexpectedly:", err);
+    process.exit(1);
   }
-
-  outputBenchmarkMarkdown(memoryTimes);
-  outputBenchmarkChart(memoryTimes);
 })();
