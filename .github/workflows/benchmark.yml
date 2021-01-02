@@ -45,6 +45,7 @@ jobs:
       #   uses: ./.github/actions/build-asset
 
       - name: Benchmark
+        id: benchmark
         # if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY
         env:
           CI: "true"
@@ -52,9 +53,26 @@ jobs:
         #   AWS_SECRET_ACCESS_KEY: ${{ secrets.BENCHMARK_AWS_SECRET_ACCESS_KEY }}
         #   AWS_REGION: ${{ secrets.BENCHMARK_AWS_REGION }}
         run: |
-          export BENCHMARK_SUFFIX=$$RANDOM
+          export BENCHMARK_SUFFIX=$RANDOM
           echo $BENCHMARK_SUFFIX
+          echo "::set-output name=BENCHMARK_SUFFIX::$BENCHMARK_SUFFIX\n"
           # npm run benchmark
+
+      - name: Benchmark
+        if: success()
+        env:
+          BENCHMARK_SUFFIX: ${{ steps.benchmark.outputs.BENCHMARK_SUFFIX }}
+        run: |
+          echo "Yay"
+          echo "$BENCHMARK_SUFFIX"
+
+      - name: Benchmark
+        if: failure()
+        env:
+          BENCHMARK_SUFFIX: ${{ steps.benchmark.outputs.BENCHMARK_SUFFIX }}
+        run: |
+          echo "Nope"
+          echo "$BENCHMARK_SUFFIX"
 
       # - name: Commit benchmark results
       #   uses: codetalkio/add-and-commit@v6
