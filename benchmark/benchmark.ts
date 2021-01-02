@@ -254,12 +254,11 @@ const fetchXRayTraceSummaries = async (functionName: string, benchmarkStartTime:
 
     // Make sure we've fetched all our traces. We only require 90% to have been gathered, since
     // XRay is sampling our requests.
-    if ((traceSummariesRes.TraceSummaries?.length ?? 0) + traceSummaries.length < COLD_STARTS * WARM_STARTS * 0.9) {
+    if ((traceSummariesRes.TraceSummaries?.length ?? 0) + traceSummaries.length < COLD_STARTS * WARM_STARTS * 0.8) {
       if (retries >= 20) {
-        console.error(
+        throw new Error(
           `[TEARDOWN] Failed to get all traces for the invocations, was only able to find '${traceSummariesRes.TraceSummaries?.length}' traces.`
         );
-        process.exit(0);
       }
       console.log("[TRACES] Traces has still not appeared, waiting 1 seconds and trying again...");
       await sleep(1000);
