@@ -3,12 +3,12 @@
 
 The following are the response time results from AWS XRay, generated after running `npm run benchmark`.
 
-![Average Cold/Warm Response Times](./benchmark/response-times-average.svg)
+![Average Cold/Warm Response Times](./response-times-average.svg)
 
 - 🔵: Average cold startup times
 - 🔴: Average warm startup times
 
-![Fastest and Slowest Response Times](./benchmark/response-times-extremes.svg)
+![Fastest and Slowest Response Times](./response-times-extremes.svg)
 
 - 🔵: Fastest warm response time
 - 🔴: Slowest warm response time
@@ -25,7 +25,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 6.9 ms |
 | Slowest cold response time | 157.9 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
@@ -217,7 +217,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 5.9 ms |
 | Slowest cold response time | 299 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
@@ -585,7 +585,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 5.9 ms |
 | Slowest cold response time | 299 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
@@ -1134,7 +1134,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 5.9 ms |
 | Slowest cold response time | 299 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
@@ -1863,7 +1863,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 5.9 ms |
 | Slowest cold response time | 299 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
@@ -2781,7 +2781,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 5.9 ms |
 | Slowest cold response time | 299 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
@@ -3879,7 +3879,7 @@ The following are the response time results from AWS XRay, generated after runni
 | Slowest warm response time | 115.9 ms |
 | Fastest cold response time  | 5.9 ms |
 | Slowest cold response time | 299 ms |
-  
+
 
 | Response time | Initialization | Invocation | Overhead | Cold/ Warm Start | Memory Size |
 |---------------|----------------|------------|----------|------------------|-------------|
