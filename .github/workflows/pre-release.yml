@@ -32,9 +32,9 @@ jobs:
           restore-keys: |
             node-
       - name: "Setup node dependencies"
-        uses: .github/actions/setup-node-deps
+        uses: ./.github/actions/setup-node-deps
       - name: "Build asset"
-        uses: .github/actions/build-asset
+        uses: ./.github/actions/build-asset
 
       - name: Deploy
         if: env.PRE_RELEASE_AWS_ACCESS_KEY_ID && env.PRE_RELEASE_AWS_SECRET_ACCESS_KEY
