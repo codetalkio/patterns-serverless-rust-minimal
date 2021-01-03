@@ -7,6 +7,7 @@ on:
       - released
 
 jobs:
+  # Generate a static build artifact for usage in deployments.
   assets:
     runs-on: ubuntu-latest
     steps:

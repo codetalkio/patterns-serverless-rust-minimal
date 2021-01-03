@@ -8,7 +8,7 @@ const { BENCHMARK_SUFFIX } = process.env;
 const STACK_NAME = BENCHMARK_SUFFIX ? `${pkg.name}-${BENCHMARK_SUFFIX}` : pkg.name;
 
 /**
- * Construct for the Serverless Rust Application.
+ * Construct for the Serverless Application.
  *
  * NOTE: We export the our construct so that it's possible to stitch it into a larger deployment.
  */
