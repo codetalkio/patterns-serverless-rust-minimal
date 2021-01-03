@@ -7,12 +7,8 @@ on:
       - released
 
 jobs:
-  deploy:
+  assets:
     runs-on: ubuntu-latest
-    name: "deploy release"
-    environment:
-      name: production
-
     steps:
       - uses: actions/checkout@v2
       - name: Validate release tag
@@ -20,7 +16,35 @@ jobs:
           # We only want to run on tags looking like refs/tags/v1200.
           echo "Checking tag: $GITHUB_REF"
           [[ "${GITHUB_REF:10:1}" == "v" ]] || exit 1
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.49.0
 
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: "Build asset"
+        uses: ./.github/actions/build-asset
+      # NOTE: Artifacts are not available across workflows.
+      - uses: actions/upload-artifact@v2
+        with:
+          name: bootstrap
+          path: ./target/cdk/release/bootstrap
+          if-no-files-found: error
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: "deploy release"
+    needs: [assets]
+    environment:
+      name: production
+
+    steps:
+      - uses: actions/checkout@v2
       - name: Setup Node.js 14.12.0
         uses: actions/setup-node@v1
         with:
@@ -32,17 +56,13 @@ jobs:
           key: node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             node-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: "Setup node dependencies"
         uses: ./.github/actions/setup-node-deps
-      - name: "Build asset"
-        uses: ./.github/actions/build-asset
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: bootstrap
+          path: ./target/cdk/release
 
       - name: Deploy
         if: env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY

@@ -235,7 +235,7 @@ Using [GitHub actions](/actions) allows us to have an efficient CI/CD setup with
 | Workflow | Trigger | Purpose | Environment Variables |
 |----------|---------|---------|-----------------------|
 | **ci** | push | Continously test the build along with linting, formatting, best-practices (clippy), and validate deployment against LocalStack | |
-| **benchmark** | Pre-release using GitHub Releases | Run benchmark suite | **BENCHMARK_AWS_ACCESS_KEY_ID** <br /> **BENCHMARK_AWS_SECRET_ACCESS_KEY** <br /> **BENCHMARK_AWS_SECRET_ACCESS_KEY** |
+| **pre-release** | Pre-release using GitHub Releases | Run benchmark suite | **BENCHMARK_AWS_ACCESS_KEY_ID** <br /> **BENCHMARK_AWS_SECRET_ACCESS_KEY** <br /> **BENCHMARK_AWS_SECRET_ACCESS_KEY** |
 | **pre-release** | Pre-release using GitHub Releases | Deploy to a QA or staging environment |  **PRE_RELEASE_AWS_ACCESS_KEY_ID** <br /> **PRE_RELEASE_AWS_SECRET_ACCESS_KEY** <br /> **PRE_RELEASE_AWS_SECRET_ACCESS_KEY** |
 | **release** | Release using GitHub Releases | Deploy to production environment | **RELEASE_AWS_ACCESS_KEY_ID** <br /> **RELEASE_AWS_SECRET_ACCESS_KEY** <br /> **RELEASE_AWS_SECRET_ACCESS_KEY** |
 
