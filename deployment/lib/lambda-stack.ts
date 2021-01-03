@@ -24,10 +24,7 @@ export class LambdaStack extends core.Stack {
       code:
         CDK_LOCAL !== "true"
           ? lambda.Code.fromAsset(bootstrapLocation)
-          : lambda.Code.fromBucket(
-              s3.Bucket.fromBucketName(this, `LocalBucket`, "__local__"),
-              bootstrapLocation
-            ),
+          : lambda.Code.fromBucket(s3.Bucket.fromBucketName(this, `LocalBucket`, "__local__"), bootstrapLocation),
       memorySize: 256,
       timeout: cdk.Duration.seconds(10),
       tracing: lambda.Tracing.ACTIVE,
@@ -39,12 +36,5 @@ export class LambdaStack extends core.Stack {
     // Tag our resource.
     core.Aspects.of(entry).add(new cdk.Tag("service-type", "API"));
     core.Aspects.of(entry).add(new cdk.Tag("billing", `lambda-${entryFnName}`));
-
-    // CloudFormation exports.
-    new cdk.CfnOutput(this, `${entryFnName}-arn`, {
-      description: `AWS ARN for the ${entryFnName} lambda resource`,
-      exportName: `${entryFnName}-function-arn`,
-      value: entry.functionArn,
-    });
   }
 }

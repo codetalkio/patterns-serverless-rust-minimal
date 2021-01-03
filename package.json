@@ -11,11 +11,11 @@
     "cdk"
   ],
   "scripts": {
-    "deploy": "npm run build:clean && npm run build && npm run cdk:deploy",
     "build": "rustup target add x86_64-unknown-linux-musl && cargo build --release --target x86_64-unknown-linux-musl && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/release/bootstrap ./target/cdk/release/bootstrap",
     "build:debug": "cargo build --target x86_64-unknown-linux-musl && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/debug/bootstrap ./target/cdk/release/bootstrap",
     "build:archive": "(cd ./target/cdk/release/ && zip ./lambda.zip ./bootstrap) && mv ./target/cdk/release/lambda.zip ./lambda.zip",
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
+    "deploy": "npm run build:clean && npm run build && npm run cdk:deploy",
     "benchmark": "export BENCHMARK_SUFFIX=${BENCHMARK_SUFFIX-$RANDOM}; npm run benchmark:setup && ts-node -- ./benchmark/benchmark.ts && npm run benchmark:destroy",
     "benchmark:setup": "[[ $DRY_RUN != 'true' ]] && CI=true npm run deploy || echo 'Dry run, skipping deploy.'",
     "benchmark:destroy": "[[ $BENCHMARK_SUFFIX != '' && $DRY_RUN != 'true' ]] &&  cdk destroy --force '*' || echo 'Dry run, skipping teardown.'",
