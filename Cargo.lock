@@ -578,7 +578,7 @@ checksum = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
 
 [[package]]
 name = "sls_rust_minimal"
-version = "0.0.1"
+version = "1.0.0"
 dependencies = [
  "netlify_lambda",
  "pretty_assertions",

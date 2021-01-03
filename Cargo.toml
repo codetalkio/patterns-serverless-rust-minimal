@@ -1,6 +1,6 @@
 [package]
 name = "sls_rust_minimal"
-version = "0.0.1"
+version = "1.0.0"
 authors = ["Christian Kjaer <ckl@codetalk.io>"]
 edition = "2018"
 readme = "README.md"

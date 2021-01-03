@@ -1,7 +1,7 @@
 {
   "name": "sls-rust-minimal",
   "description": "Deployment tools for the minimal Serverless Rust application.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Christian Kjaer <ckl@codetalk.io>",
   "license": "MIT",
   "keywords": [
