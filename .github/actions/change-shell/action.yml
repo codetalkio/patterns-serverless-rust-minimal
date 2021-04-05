@@ -1,0 +1,11 @@
+name: "Change shell"
+description: "Convert /bin/sh to /bin/bash"
+
+runs:
+  using: "composite"
+  steps:
+    # Convert /bin/sh to /bin/bash.
+    - run: |
+        sudo mv /bin/sh /bin/sh-dash
+        sudo ln -s /bin/bash /bin/sh
+      shell: bash

@@ -17,7 +17,7 @@
     "build:clean": "rm -r ./target/cdk/release || echo '[build:clean] No existing release found.'",
     "deploy": "npm run build:clean && npm run build && npm run cdk:deploy",
     "benchmark": "export BENCHMARK_SUFFIX=${BENCHMARK_SUFFIX-$RANDOM}; npm run benchmark:setup && ts-node -- ./benchmark/benchmark.ts && npm run benchmark:destroy",
-    "benchmark:setup": "[[ $DRY_RUN != 'true' ]] && CI=true npm run deploy || echo 'Dry run, skipping deploy.'",
+    "benchmark:setup": "[[ $DRY_RUN != 'true' ]] && CI=true npm run cdk:deploy || echo 'Dry run, skipping deploy.'",
     "benchmark:destroy": "[[ $BENCHMARK_SUFFIX != '' && $DRY_RUN != 'true' ]] &&  cdk destroy --force '*' || echo 'Dry run, skipping teardown.'",
     "cdk:synth": "cdk synth",
     "cdk:diff": "cdk diff",
