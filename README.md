@@ -205,7 +205,7 @@ $ aws iam delete-role --role-name sls-rust-test-execution
 LocalStack allows us to deploy our CDK services directly to our local environment:
 
 1. `npm run cdklocal:start` to start the LocalStack services.
-2. `npm run cdklocal:boostrap` to create the necessary CDK stack resources on the cloud.
+2. `npm run cdklocal:bootstrap` to create the necessary CDK stack resources on the cloud.
 3. `npm run cdklocal:deploy` to deploy our stack.
 4. Target the local services from our application, with `cdklocal`, or by setting the `endpoint` option on the AWS CLI, e.g. `aws --endpoint-url=http://localhost:4566`.
 
